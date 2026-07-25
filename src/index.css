@@ -42,7 +42,7 @@ body {
   background-color: var(--bg-darker);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

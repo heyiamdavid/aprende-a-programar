@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth, UserButton, useUser } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
-import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, Target, BrainCircuit, Layout, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, Target, BrainCircuit, Layout, PanelLeftClose, PanelLeftOpen, ArrowLeft, Trophy, Zap } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import Split from 'react-split';
@@ -44,6 +44,31 @@ export default function EditorPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ruta = searchParams.get('ruta') || 'python';
+
+  // Filter challenges by route
+  const routeChallenges = (() => {
+    if (ruta === 'poo-proyectos') {
+      return CHALLENGES.filter(c => c.category === 'Proyectos POO');
+    }
+    if (ruta === 'algoritmos') {
+      return CHALLENGES.filter(c => c.category === 'Programación Estructurada' || c.category === 'Estructuras de Datos');
+    }
+    if (ruta === 'javascript') {
+      return CHALLENGES.filter(c => c.category.includes('JavaScript'));
+    }
+    // Default: python route
+    return CHALLENGES.filter(c => c.category !== 'Proyectos POO' && c.category !== 'Programación Estructurada' && c.category !== 'Estructuras de Datos' && !c.category.includes('JavaScript'));
+  })();
+
+  // Sidebar label by route
+  const routeLabel = (() => {
+    if (ruta === 'poo-proyectos') return 'Proyectos POO';
+    if (ruta === 'algoritmos') return 'Algoritmos y Estructuras';
+    if (ruta === 'javascript') return 'JavaScript Moderno';
+    return 'Ruta de Python';
+  })();
 
   // Redirect if not signed in
   useEffect(() => {
@@ -54,18 +79,35 @@ export default function EditorPage() {
 
   // Active challenge persisted in localStorage
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge>(() => {
-    const savedId = localStorage.getItem('active_challenge_id');
+    const savedId = localStorage.getItem(`active_challenge_id_${ruta}`);
     if (savedId) {
-      const found = CHALLENGES.find((c) => c.id === Number(savedId));
+      const found = routeChallenges.find((c) => c.id === Number(savedId));
       if (found) return found;
     }
-    return CHALLENGES[0];
+    return routeChallenges[0] || CHALLENGES[0];
   });
 
   const [code, setCode] = useState<string>(() => {
     const savedCode = localStorage.getItem(`code_challenge_${selectedChallenge.id}`);
     return savedCode !== null ? savedCode : selectedChallenge.initialCode;
   });
+
+  // Sync selected challenge when route changes
+  useEffect(() => {
+    const savedId = localStorage.getItem(`active_challenge_id_${ruta}`);
+    let found;
+    if (savedId) {
+      found = routeChallenges.find((c) => c.id === Number(savedId));
+    }
+    const newSelected = found || routeChallenges[0] || CHALLENGES[0];
+    
+    if (newSelected && newSelected.id !== selectedChallenge.id) {
+      setSelectedChallenge(newSelected);
+      const savedCode = localStorage.getItem(`code_challenge_${newSelected.id}`);
+      setCode(savedCode !== null ? savedCode : newSelected.initialCode);
+      setOutput(`Cargado: ${newSelected.title}\n`);
+    }
+  }, [ruta, routeChallenges, selectedChallenge.id]);
 
   const [output, setOutput] = useState<string>('Salida de consola...');
   const [isReviewing, setIsReviewing] = useState(false);
@@ -74,7 +116,7 @@ export default function EditorPage() {
   const [showProfile, setShowProfile] = useState(false);
   const [lessonTab, setLessonTab] = useState<'lesson' | 'reto'>('lesson');
   type LayoutMode = 'vertical' | 'horizontal' | 'horizontal-reverse';
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('vertical');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('horizontal');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [, setRenderTrigger] = useState(0);
 
@@ -85,7 +127,7 @@ export default function EditorPage() {
 
   // Initialize Pyodide
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!isSignedIn || ruta === 'javascript') return;
     let isMounted = true;
 
     async function initPyodide() {
@@ -126,7 +168,7 @@ export default function EditorPage() {
   // Challenge selection + restore code
   const handleSelectChallenge = (ch: Challenge) => {
     setSelectedChallenge(ch);
-    localStorage.setItem('active_challenge_id', ch.id.toString());
+    localStorage.setItem(`active_challenge_id_${ruta}`, ch.id.toString());
     const saved = localStorage.getItem(`code_challenge_${ch.id}`);
     setCode(saved !== null ? saved : ch.initialCode);
     setOutput(`Cargado: ${ch.title}\n`);
@@ -154,8 +196,27 @@ export default function EditorPage() {
 
   // Run code
   const handleRunCode = async () => {
-    if (!pyodideReady || !pyodideRef.current) return;
     setOutput('');
+
+    if (ruta === 'javascript') {
+      const logBuffer: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args) => {
+        logBuffer.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      };
+      try {
+        // eslint-disable-next-line no-eval
+        eval(code);
+        setOutput(logBuffer.join('\n') + '\n');
+      } catch (err: any) {
+        setOutput(logBuffer.join('\n') + `\n[Error]: ${err.message}\n`);
+      } finally {
+        console.log = originalLog;
+      }
+      return;
+    }
+
+    if (!pyodideReady || !pyodideRef.current) return;
 
     pyodideRef.current.setStdout({ batched: (msg: string) => setOutput((p) => p + msg + '\n') });
     pyodideRef.current.setStderr({ batched: (msg: string) => setOutput((p) => p + '[Error] ' + msg + '\n') });
@@ -197,21 +258,34 @@ export default function EditorPage() {
   const sidebarContent = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 8px 16px 16px', overflow: 'hidden' }}>
       <aside className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px', borderBottom: '2px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <BookOpen size={20} color="var(--accent-primary)" />
-          <h2 style={{ fontSize: '1.05rem', margin: 0, flex: 1 }}>Ruta de Python</h2>
+        <div style={{ padding: '12px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button
-            onClick={() => navigate('/quiz')}
-            title="Quiz de conocimiento"
-            style={{ background: 'rgba(168,85,247,0.15)', border: '2px solid rgba(168,85,247,0.4)', borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', color: '#a855f7', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-sans)' }}
+            onClick={() => navigate('/')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', padding: '4px 0', fontFamily: 'var(--font-sans)', fontWeight: 600, transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
           >
-            <BrainCircuit size={15} /> Quiz
+            <ArrowLeft size={14} /> Cambiar ruta
           </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {ruta === 'poo-proyectos' ? <Trophy size={20} color="#f59e0b" /> : 
+             ruta === 'algoritmos' ? <BrainCircuit size={20} color="#10b981" /> :
+             ruta === 'javascript' ? <Zap size={20} color="#eab308" /> :
+             <BookOpen size={20} color="var(--accent-primary)" />}
+            <h2 style={{ fontSize: '1rem', margin: 0, flex: 1 }}>{routeLabel}</h2>
+            <button
+              onClick={() => navigate('/quiz')}
+              title="Quiz de conocimiento"
+              style={{ background: 'rgba(168,85,247,0.15)', border: '2px solid rgba(168,85,247,0.4)', borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', color: '#a855f7', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-sans)' }}
+            >
+              <BrainCircuit size={15} /> Quiz
+            </button>
+          </div>
         </div>
 
         <div style={{ flex: 1, padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {Object.entries(
-            CHALLENGES.reduce((acc, ch) => {
+            routeChallenges.reduce((acc, ch) => {
               if (!acc[ch.category]) acc[ch.category] = [];
               acc[ch.category].push(ch);
               return acc;
@@ -361,7 +435,7 @@ export default function EditorPage() {
       <div style={{ overflow: 'hidden', paddingTop: '4px', display: 'flex', flexDirection: 'column' }}>
         <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>main.py</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{ruta === 'javascript' ? 'main.js' : 'main.py'}</span>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={handleCompleteChallenge}
@@ -392,7 +466,7 @@ export default function EditorPage() {
           <div style={{ flex: 1 }}>
             <Editor
               height="100%"
-              defaultLanguage="python"
+              language={ruta === 'javascript' ? 'javascript' : 'python'}
               theme="vs-dark"
               value={code}
               onChange={handleCodeChange}

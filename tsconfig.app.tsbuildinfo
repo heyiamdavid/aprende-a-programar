@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/data/challenges.ts","./src/lib/groq.ts","./src/lib/supabase.ts"],"version":"6.0.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/profilemodal.tsx","./src/data/challenges.ts","./src/data/quiz.ts","./src/lib/groq.ts","./src/lib/supabase.ts","./src/pages/editorpage.tsx","./src/pages/landingpage.tsx","./src/pages/quizpage.tsx","./src/pages/signinpage.tsx","./src/pages/signuppage.tsx"],"version":"6.0.3"}

@@ -3,6 +3,7 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import EditorPage from './pages/EditorPage';
 import QuizPage from './pages/QuizPage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         <Route path="/sign-in/*" element={<SignInPage />} />
         <Route path="/sign-up/*" element={<SignUpPage />} />
         <Route path="/quiz" element={<QuizPage />} />
-        <Route path="/*" element={<EditorPage />} />
+        <Route path="/editor" element={<EditorPage />} />
+        <Route path="/*" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
   );
