@@ -223,3 +223,25 @@ body {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyCB2iAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
   cursor: row-resize;
 }
+ /* Responsive Utilities */
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .responsive-stack {
+    flex-direction: column !important;
+  }
+  .responsive-padding {
+    padding: 24px 16px !important;
+  }
+  .responsive-heading {
+    font-size: 1.8rem !important;
+  }
+  .responsive-modal {
+    width: 95vw !important;
+    max-height: 90vh !important;
+  }
+  .responsive-split-vertical > .gutter {
+    cursor: row-resize !important;
+  }
+}

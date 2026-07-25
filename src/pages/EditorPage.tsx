@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth, UserButton, useUser } from '@clerk/clerk-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, Target, BrainCircuit, Layout, PanelLeftClose, PanelLeftOpen, ArrowLeft, Trophy, Zap } from 'lucide-react';
+import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, Target, BrainCircuit, Layout, PanelLeftClose, PanelLeftOpen, ArrowLeft, Trophy, Zap, Code2 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import Split from 'react-split';
@@ -128,6 +128,21 @@ export default function EditorPage() {
   const isDraggingRef = useRef(false);
   const startYRef = useRef(0);
   const startHeightRef = useRef(200);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [mobileTab, setMobileTab] = useState<'instructions' | 'editor'>('instructions');
+
+  // Responsive layout adjustments
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setLayoutMode('vertical');
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Initialize Pyodide
   useEffect(() => {
@@ -190,23 +205,50 @@ export default function EditorPage() {
   };
 
   // Resizable terminal
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleStartDrag = (clientY: number) => {
     isDraggingRef.current = true;
-    startYRef.current = e.clientY;
+    startYRef.current = clientY;
     startHeightRef.current = consoleHeight;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchUp);
   };
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  
+  const handleMouseDown = (e: React.MouseEvent) => handleStartDrag(e.clientY);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Only handle single touch
+    if (e.touches.length === 1) {
+      handleStartDrag(e.touches[0].clientY);
+    }
+  };
+
+  const handleDragMove = useCallback((clientY: number) => {
     if (!isDraggingRef.current) return;
-    const delta = startYRef.current - e.clientY;
+    const delta = startYRef.current - clientY;
     setConsoleHeight(Math.max(100, Math.min(500, startHeightRef.current + delta)));
   }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => handleDragMove(e.clientY), [handleDragMove]);
+  
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (isDraggingRef.current) {
+      e.preventDefault(); // Prevent scrolling while dragging
+      handleDragMove(e.touches[0].clientY);
+    }
+  }, [handleDragMove]);
+
   const handleMouseUp = useCallback(() => {
     isDraggingRef.current = false;
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
+
+  const handleTouchUp = useCallback(() => {
+    isDraggingRef.current = false;
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchUp);
+  }, [handleTouchMove]);
 
   // Run code
   const handleRunCode = async () => {
@@ -320,6 +362,14 @@ export default function EditorPage() {
           >
             <ArrowLeft size={14} /> Cambiar ruta
           </button>
+          {isMobile && (
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              style={{ position: 'absolute', right: '16px', top: '16px', background: 'none', border: 'none', color: 'var(--text-secondary)' }}
+            >
+              <PanelLeftClose size={20} />
+            </button>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {ruta === 'poo-proyectos' ? <Trophy size={20} color="#f59e0b" /> : 
              ruta === 'algoritmos' ? <BrainCircuit size={20} color="#10b981" /> :
@@ -404,20 +454,11 @@ export default function EditorPage() {
     </div>
   );
 
-  const mainContent = (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: isSidebarOpen ? '16px 16px 16px 8px' : '16px', overflow: 'hidden', flex: 1, minWidth: 0 }}>
-      <Split
-            sizes={[35, 65]}
-            minSize={150}
-            gutterSize={10}
-            direction={layoutMode.includes('horizontal') ? 'horizontal' : 'vertical'}
-            style={{ display: 'flex', flexDirection: layoutMode === 'horizontal-reverse' ? 'row-reverse' : (layoutMode === 'horizontal' ? 'row' : 'column'), height: '100%' }}
-          >
-            {/* Top panel: Lesson + Instructions */}
-            <div style={{ overflow: 'hidden', paddingBottom: '4px' }}>
-              <div className="solid-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+  const instructionsPanelJSX = (
+    <div style={{ overflow: 'hidden', paddingBottom: isMobile ? '0' : '4px', display: isMobile && mobileTab !== 'instructions' ? 'none' : 'block', flex: isMobile ? 1 : undefined }}>
+      <div className="solid-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', borderTopLeftRadius: isMobile ? 0 : '16px', borderTopRightRadius: isMobile ? 0 : '16px' }}>
           {/* Tab header */}
-          <div style={{ display: 'flex', borderBottom: '2px solid var(--border-color)', alignItems: 'center' }}>
+          <div style={{ display: 'flex', borderBottom: '2px solid var(--border-color)', alignItems: 'center', overflowX: 'auto', flexShrink: 0 }}>
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               title={isSidebarOpen ? "Ocultar panel lateral" : "Mostrar panel lateral"}
@@ -529,38 +570,42 @@ export default function EditorPage() {
           </div>
         </div>
       </div>
+  );
 
-      {/* Editor & Console Panel */}
-      <div style={{ overflow: 'hidden', paddingTop: '4px', display: 'flex', flexDirection: 'column' }}>
-        <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  const editorPanelJSX = (
+    <div style={{ overflow: 'hidden', paddingTop: isMobile ? '10px' : '4px', display: isMobile && mobileTab !== 'editor' ? 'none' : 'flex', flexDirection: 'column', flex: isMobile ? 1 : undefined }}>
+      <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflowX: 'auto', flexShrink: 0 }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{ruta === 'javascript' ? 'main.js' : 'main.py'}</span>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={handleCompleteChallenge}
                 disabled={isCompleting || cooldownTime > 0}
                 className="btn-chunky"
-                style={{ background: 'var(--bg-darker)', color: cooldownTime > 0 ? 'var(--text-secondary)' : 'var(--success)', border: '2px solid rgba(88,204,2,0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                style={{ background: 'var(--bg-darker)', color: cooldownTime > 0 ? 'var(--text-secondary)' : 'var(--success)', border: '2px solid rgba(88,204,2,0.3)', display: 'flex', alignItems: 'center', gap: isMobile ? '0' : '8px', padding: isMobile ? '8px 12px' : undefined }}
                 title={cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Validar y Completar'}
               >
                 <CheckCircle size={18} />
-                {isCompleting ? 'Validando...' : cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Completar'}
+                {!isMobile && (isCompleting ? 'Validando...' : cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Completar')}
               </button>
               <button
                 onClick={handleReviewCode}
                 disabled={isReviewing || cooldownTime > 0}
                 className="btn-chunky btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '0' : '8px', padding: isMobile ? '8px 12px' : undefined }}
                 title={cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Revisión IA'}
               >
                 <Sparkles size={18} />
-                {isReviewing ? 'Revisando...' : cooldownTime > 0 ? `IA (${cooldownTime}s)` : 'Revisión IA'}
+                {!isMobile && (isReviewing ? 'Revisando...' : cooldownTime > 0 ? `IA (${cooldownTime}s)` : 'Revisión IA')}
               </button>
               <button
                 onClick={handleRunCode}
                 className="btn-chunky btn-success"
+                style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '0' : '8px', padding: isMobile ? '8px 12px' : undefined }}
+                title="Ejecutar"
               >
                 <Play size={18} fill="white" />
-                Ejecutar
+                {!isMobile && 'Ejecutar'}
               </button>
             </div>
           </div>
@@ -579,7 +624,8 @@ export default function EditorPage() {
         {/* Resize handle */}
         <div
           onMouseDown={handleMouseDown}
-          style={{ height: '8px', cursor: 'ns-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', userSelect: 'none', margin: '4px 0' }}
+          onTouchStart={handleTouchStart}
+          style={{ height: '14px', cursor: 'ns-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', userSelect: 'none', margin: '2px 0', touchAction: 'none' }}
         >
           <GripHorizontal size={14} color="var(--text-secondary)" />
         </div>
@@ -595,22 +641,50 @@ export default function EditorPage() {
           </div>
         </div>
       </div>
-    </Split>
-  </div>
+  );
+
+  const mainContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: isSidebarOpen && !isMobile ? '16px 16px 16px 8px' : '16px', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+      {isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ display: 'flex', background: 'var(--bg-panel)', border: '2px solid var(--border-color)', borderBottom: 'none', borderRadius: '16px 16px 0 0', overflow: 'hidden', flexShrink: 0 }}>
+             <button onClick={() => setMobileTab('instructions')} style={{ flex: 1, padding: '12px', background: mobileTab === 'instructions' ? 'var(--accent-primary)' : 'transparent', color: mobileTab === 'instructions' ? 'white' : 'var(--text-secondary)', border: 'none', fontWeight: 700, fontFamily: 'var(--font-sans)', display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
+               <BookOpen size={16} /> Teoría y Reto
+             </button>
+             <button onClick={() => setMobileTab('editor')} style={{ flex: 1, padding: '12px', background: mobileTab === 'editor' ? 'var(--accent-primary)' : 'transparent', color: mobileTab === 'editor' ? 'white' : 'var(--text-secondary)', border: 'none', fontWeight: 700, fontFamily: 'var(--font-sans)', display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
+               <Code2 size={16} /> Código
+             </button>
+          </div>
+          {instructionsPanelJSX}
+          {editorPanelJSX}
+        </div>
+      ) : (
+        <Split
+          sizes={[35, 65]}
+          minSize={150}
+          gutterSize={10}
+          direction={layoutMode.includes('horizontal') ? 'horizontal' : 'vertical'}
+          style={{ display: 'flex', flexDirection: layoutMode === 'horizontal-reverse' ? 'row-reverse' : (layoutMode === 'horizontal' ? 'row' : 'column'), height: '100%' }}
+        >
+          {instructionsPanelJSX}
+          {editorPanelJSX}
+        </Split>
+      )}
+    </div>
   );
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)' }}>
       {isSidebarOpen ? (
         <Split 
-          sizes={[22, 78]} 
-          minSize={250}
-          gutterSize={10}
+          sizes={isMobile ? [100, 0] : [22, 78]} 
+          minSize={isMobile ? 0 : 250}
+          gutterSize={isMobile ? 0 : 10}
           direction="horizontal" 
           style={{ display: 'flex', width: '100vw', height: '100vh' }}
         >
           {sidebarContent}
-          {mainContent}
+          {!isMobile && mainContent}
         </Split>
       ) : (
         <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>

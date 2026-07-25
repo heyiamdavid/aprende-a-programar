@@ -112,9 +112,9 @@ export default function LandingPage() {
       </div>
 
       {/* Grid */}
-      <div style={{
+      <div className="responsive-grid" style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))",
         gap: "22px",
         maxWidth: "860px",
         width: "100%",

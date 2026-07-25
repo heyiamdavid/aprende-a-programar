@@ -345,7 +345,7 @@ export default function QuizPage() {
         <div style={{ padding: '28px' }}>
           {/* Score */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ fontSize: '5rem', fontWeight: 800, lineHeight: 1, color: grade.color }}>{pct}%</div>
+            <div style={{ fontSize: 'clamp(3rem, 15vw, 5rem)', fontWeight: 800, lineHeight: 1, color: grade.color }}>{pct}%</div>
             <div style={{ fontSize: '1.2rem', fontWeight: 700, color: grade.color, marginTop: '8px' }}>{grade.label}</div>
             <div style={{ color: 'var(--text-secondary)', marginTop: '6px', fontSize: '0.9rem' }}>
               {score} correctas de {questions.length}

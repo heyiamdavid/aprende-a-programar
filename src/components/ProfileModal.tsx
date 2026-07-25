@@ -30,7 +30,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="solid-panel"
+        className="solid-panel responsive-modal"
         style={{
           width: '520px', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
           overflow: 'hidden', position: 'relative',
@@ -79,7 +79,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
           </div>
 
           {/* Stats */}
-          <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', borderBottom: '2px solid var(--border-color)' }}>
+          <div className="responsive-grid" style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', borderBottom: '2px solid var(--border-color)' }}>
             <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-darker)', borderRadius: '12px', border: '2px solid var(--border-color)' }}>
               <div style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--success)' }}>{completedCount}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Completados</div>
