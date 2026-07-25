@@ -124,7 +124,13 @@ export default function EditorPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [, setRenderTrigger] = useState(0);
 
-  const pyodideRef = useRef<any>(null);
+  // Custom input modal state (replaces window.prompt)
+  const [inputPrompt, setInputPrompt] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
+  const [showInputModal, setShowInputModal] = useState(false);
+
+  const workerRef = useRef<Worker | null>(null);
+  const sharedBufferRef = useRef<SharedArrayBuffer | null>(null);
   const isDraggingRef = useRef(false);
   const startYRef = useRef(0);
   const startHeightRef = useRef(200);
@@ -144,38 +150,86 @@ export default function EditorPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Initialize Pyodide
+  // Initialize Pyodide via Web Worker
   useEffect(() => {
     if (!isSignedIn || ruta === 'javascript') return;
-    let isMounted = true;
 
-    async function initPyodide() {
-      setOutput('Cargando entorno Python (Pyodide)...\n');
-      if (!window.loadPyodide) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error('Fallo al cargar script de Pyodide'));
-          document.head.appendChild(script);
-        });
-      }
-      if (!isMounted) return;
-      try {
-        const pyodide = await window.loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
-        if (!isMounted) return;
+    setOutput('Cargando entorno Python (Pyodide)...\n');
 
-        pyodideRef.current = pyodide;
+    let sab: SharedArrayBuffer;
+    try {
+      // SharedArrayBuffer requires COOP/COEP headers to be enabled.
+      // If the server was recently configured, a restart is needed.
+      sab = new SharedArrayBuffer(4096);
+    } catch {
+      setOutput(
+        '[Error] SharedArrayBuffer no disponible.\n' +
+        'Reinicia el servidor de desarrollo con: npm run dev\n' +
+        'Las nuevas cabeceras de seguridad necesitan un reinicio para activarse.\n'
+      );
+      return;
+    }
+    sharedBufferRef.current = sab;
+
+    let worker: Worker;
+    try {
+      // Classic worker in /public — supports importScripts() for Pyodide
+      worker = new Worker('/pyodide-worker.js');
+    } catch (e: any) {
+      setOutput(`[Error] No se pudo crear el Worker: ${e?.message ?? e}\n`);
+      return;
+    }
+    workerRef.current = worker;
+
+    worker.onerror = (e) => {
+      setOutput(p => p + `\n[Worker Error] ${e.message ?? 'Error desconocido en el worker'}\n`);
+    };
+
+    worker.onmessage = (e: MessageEvent) => {
+      const msg = e.data;
+      if (msg.type === 'READY') {
         setPyodideReady(true);
         setOutput('¡Entorno listo! Escribe tu código y presiona Ejecutar.\n');
-      } catch (err: any) {
-        if (isMounted) setOutput(`Error inicializando Pyodide: ${err.message ?? err}`);
+      } else if (msg.type === 'STDOUT') {
+        setOutput(p => p + msg.text + '\n');
+      } else if (msg.type === 'STDERR') {
+        setOutput(p => p + '[Error] ' + msg.text + '\n');
+      } else if (msg.type === 'DONE') {
+        // execution finished
+      } else if (msg.type === 'ERROR') {
+        setOutput(p => p + '\n' + msg.error);
+      } else if (msg.type === 'REQUEST_INPUT') {
+        setInputPrompt(msg.prompt || 'Tu programa pide un valor:');
+        setInputValue('');
+        setShowInputModal(true);
       }
-    }
+    };
 
-    initPyodide();
-    return () => { isMounted = false; };
+    worker.postMessage({ type: 'INIT' });
+
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+      setPyodideReady(false);
+    };
   }, [isSignedIn, ruta]);
+
+
+  // Handler called when user submits the custom input modal
+  const handleInputSubmit = useCallback((value: string) => {
+    setShowInputModal(false);
+    const sab = sharedBufferRef.current;
+    if (!sab) return;
+    const controlArray = new Int32Array(sab, 0, 2);
+    const textArray = new Uint8Array(sab, 8);
+    // Encode the user's text into the shared buffer
+    const encoded = new TextEncoder().encode(value);
+    textArray.fill(0); // clear
+    textArray.set(encoded.subarray(0, textArray.length - 1));
+    // Signal the worker that input is ready
+    Atomics.store(controlArray, 0, 1);
+    Atomics.notify(controlArray, 0);
+  }, []);
 
   // Cooldown timer logic
   useEffect(() => {
@@ -272,22 +326,14 @@ export default function EditorPage() {
       return;
     }
 
-    if (!pyodideReady || !pyodideRef.current) return;
+    if (!pyodideReady || !workerRef.current || !sharedBufferRef.current) return;
 
-    pyodideRef.current.setStdout({ batched: (msg: string) => setOutput((p) => p + msg + '\n') });
-    pyodideRef.current.setStderr({ batched: (msg: string) => setOutput((p) => p + '[Error] ' + msg + '\n') });
-    pyodideRef.current.setStdin({
-      stdin: () => {
-        const result = window.prompt('Entrada para Python input():');
-        return result !== null ? result : '';
-      },
+    // Send code to the worker to execute
+    workerRef.current.postMessage({
+      type: 'RUN_CODE',
+      code,
+      sharedBuffer: sharedBufferRef.current,
     });
-
-    try {
-      await pyodideRef.current.runPythonAsync(code);
-    } catch (err: any) {
-      setOutput((p) => p + `\n${err}`);
-    }
   };
 
   // AI Review
@@ -694,6 +740,110 @@ export default function EditorPage() {
 
       {/* Profile Modal */}
       {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
+
+      {/* Custom Python input() Modal */}
+      {showInputModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(6px)',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              background: 'var(--bg-panel)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '24px',
+              padding: '32px',
+              width: 'min(90vw, 460px)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+              animation: 'slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{
+                width: '40px', height: '40px',
+                background: 'rgba(28,176,246,0.15)',
+                borderRadius: '12px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '2px',
+              }}>
+                <Terminal size={20} color="var(--accent-primary)" />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                  Python — input()
+                </p>
+                <p style={{ margin: '4px 0 0', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', lineHeight: 1.4 }}>
+                  {inputPrompt || 'Tu programa necesita un valor'}
+                </p>
+              </div>
+            </div>
+
+            {/* Input field */}
+            <input
+              autoFocus
+              type="text"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleInputSubmit(inputValue); }}
+              placeholder={inputPrompt ? `Escribe tu respuesta y presiona Enter…` : 'Escribe aquí y presiona Enter…'}
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '2px solid rgba(28,176,246,0.35)',
+                borderRadius: '14px',
+                padding: '14px 18px',
+                fontSize: '1rem',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--text-primary)',
+                outline: 'none',
+                width: '100%',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.2s',
+              }}
+            />
+
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => handleInputSubmit('')}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '14px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '2px solid var(--border-color)',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600, cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.95rem',
+                  transition: 'all 0.2s',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleInputSubmit(inputValue)}
+                className="btn-chunky btn-primary"
+                style={{
+                  flex: 2, padding: '12px', borderRadius: '14px',
+                  fontSize: '1rem', fontWeight: 700,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                }}
+              >
+                <Play size={16} fill="white" />
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,6 +9,9 @@ const features = [
 ];
 
 const clerkAppearance = {
+  layout: {
+    socialButtonsPlacement: "bottom" as const,
+  },
   variables: {
     colorPrimary: '#1cb0f6',
     colorBackground: '#1e1e1e',
@@ -16,16 +19,67 @@ const clerkAppearance = {
     colorTextSecondary: '#a0a0a0',
     colorInputBackground: '#121212',
     colorInputText: '#ffffff',
-    borderRadius: '12px',
+    borderRadius: '16px',
   },
   elements: {
     card: {
       background: 'var(--bg-panel)',
       border: '2px solid var(--border-color)',
-      boxShadow: 'none',
+      boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+      borderRadius: '24px',
+      padding: '32px',
+    },
+    headerTitle: {
+      fontSize: '1.5rem',
+      fontWeight: '700',
+    },
+    formFieldInput: {
+      background: 'rgba(255, 255, 255, 0.03)',
+      border: '2px solid rgba(255, 255, 255, 0.08)',
+      color: '#fff',
+      padding: '0.8rem 1.2rem',
+      fontSize: '1rem',
+      borderRadius: '12px',
+      transition: 'all 0.2s ease',
+    },
+    formFieldLabel: {
+      color: 'var(--text-secondary)',
+      marginBottom: '8px',
+      fontWeight: '600',
+    },
+    formButtonPrimary: {
+      background: 'var(--accent-primary)',
+      border: 'none',
+      borderBottom: '4px solid #1899d6',
+      borderRadius: '16px',
+      fontSize: '1.05rem',
+      fontWeight: '700',
+      padding: '14px',
+      textTransform: 'none',
+      marginTop: '8px',
+      transition: 'all 0.2s',
+    },
+    socialButtonsBlockButton: {
+      background: 'rgba(255, 255, 255, 0.03)',
+      border: '2px solid rgba(255, 255, 255, 0.08)',
+      color: '#fff',
+      borderRadius: '16px',
+      padding: '12px',
+      fontWeight: '600',
+      transition: 'all 0.2s',
     },
     footer: { background: 'transparent' },
     footerAction: { color: '#a0a0a0' },
+    footerActionLink: {
+      color: 'var(--accent-primary)',
+      fontWeight: '600',
+    },
+    dividerLine: {
+      background: 'rgba(255, 255, 255, 0.1)',
+    },
+    dividerText: {
+      color: '#a0a0a0',
+    }
   },
 };
 
