@@ -31,7 +31,7 @@ const clerkAppearance = {
 
 export default function SignInPage() {
   return (
-    <div className="responsive-stack" style={{ display: 'flex', width: '100vw', height: '100vh', background: 'var(--bg-darker)', overflow: 'auto' }}>
+    <div className="responsive-stack" style={{ display: 'flex', width: '100%', minHeight: '100vh', background: 'var(--bg-darker)' }}>
       {/* Left branding panel */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -63,7 +63,7 @@ export default function SignInPage() {
       </div>
 
       {/* Right: Clerk form */}
-      <div className="responsive-padding" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px', minWidth: 'min(100%, 480px)', overflowY: 'auto' }}>
+      <div className="responsive-padding" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px', minWidth: 'min(100%, 480px)' }}>
         <div style={{ margin: 'auto' }}>
           <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" appearance={clerkAppearance} />
         </div>
