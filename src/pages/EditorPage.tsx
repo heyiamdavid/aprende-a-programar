@@ -53,12 +53,18 @@ export default function EditorPage() {
     if (ruta === 'poo-proyectos') {
       list = CHALLENGES.filter(c => c.category === 'Proyectos POO');
     } else if (ruta === 'algoritmos') {
-      list = CHALLENGES.filter(c => c.id >= 30 || c.category === 'Programación Estructurada');
+      // Algoritmos route: Programación Estructurada (37-39) + Estructuras de Datos (30-36)
+      list = CHALLENGES.filter(c => c.category === 'Programación Estructurada' || c.category === 'Estructuras de Datos');
     } else if (ruta === 'javascript') {
       list = CHALLENGES.filter(c => c.category.includes('JavaScript'));
     } else {
-      // Default: python route
-      list = CHALLENGES.filter(c => c.id < 30 && c.category !== 'Proyectos POO' && !c.category.includes('JavaScript'));
+      // Default: python route — ids 1-29, no POO projects, no JS, no Estructurada
+      list = CHALLENGES.filter(c =>
+        c.id < 30 &&
+        c.category !== 'Proyectos POO' &&
+        c.category !== 'Programación Estructurada' &&
+        !c.category.includes('JavaScript')
+      );
     }
     return list.sort((a, b) => a.id - b.id);
   })();

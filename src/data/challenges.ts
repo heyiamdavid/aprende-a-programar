@@ -1071,7 +1071,7 @@ class ProcesadorVentas:
   // MÓDULO 14: Proyectos POO
   // ─────────────────────────────────────────────
   {
-    id: 29,
+    id: 50,
     type: 'project',
     title: "🏛️ Proyecto: Sistema de Biblioteca",
     category: "Proyectos POO",
@@ -1116,7 +1116,7 @@ Sistema
     initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
-    id: 26,
+    id: 51,
     type: 'project',
     title: "🛒 Proyecto: Sistema de Inventario",
     category: "Proyectos POO",
@@ -1162,8 +1162,8 @@ ReporteVentas (Observer)
   // MÓDULO 14: Programación Estructurada
   // ─────────────────────────────────────────────
   {
-    id: 27,
-    title: "27. Pseudocódigo y Diagramas de Flujo",
+    id: 37,
+    title: "37. Pseudocódigo y Diagramas de Flujo",
     category: "Programación Estructurada",
     lesson: `## Programación Estructurada
 
@@ -1229,8 +1229,8 @@ FIN
     initialCode: '# TODO: Traduce el pseudocódigo a Python\n# 1. Pide 5 números al usuario (usa un bucle for y append)\n# 2. Calcula la suma y el promedio\n# 3. Determina si el promedio es >= 7 (Aprobado) o no (Reprobado)\n\nnumeros = []\nfor i in range(5):\n    n = float(input(f"Número {i+1}: "))\n    # TODO: Agregar n a la lista\n    pass\n\n# TODO: Calcular suma y promedio\n\n# TODO: Imprimir resultado\n'
   },
   {
-    id: 28,
-    title: "28. Diseño Modular y Funciones",
+    id: 38,
+    title: "38. Diseño Modular y Funciones",
     category: "Programación Estructurada",
     lesson: `## Diseño Modular
 
@@ -1283,8 +1283,8 @@ mostrar_resultado(prom, estado)
     initialCode: '# ─── Tu refactorización modular ───────────────\nventas = [1500, 2300, 890, 3100, 1750, 2800, 960]\n\ndef calcular_total(ventas):\n    """Retorna la suma de todas las ventas."""\n    # TODO\n    pass\n\ndef calcular_promedio(ventas):\n    """Retorna el promedio de ventas."""\n    # TODO\n    pass\n\ndef encontrar_max_min(ventas):\n    """Retorna una tupla (maximo, minimo)."""\n    # TODO\n    pass\n\ndef mostrar_reporte(total, promedio, maximo, minimo):\n    """Imprime el reporte de ventas formateado."""\n    print("=== REPORTE DE VENTAS ===")\n    # TODO: Imprimir cada valor\n    pass\n\n# ─── Programa principal ───\ntotal = calcular_total(ventas)\npromedio = calcular_promedio(ventas)\nmaximo, minimo = encontrar_max_min(ventas)\nmostrar_reporte(total, promedio, maximo, minimo)\n'
   },
   {
-    id: 29,
-    title: "29. Recursión",
+    id: 39,
+    title: "39. Recursión",
     category: "Programación Estructurada",
     lesson: `## Recursión — Funciones que se llaman a sí mismas
 
