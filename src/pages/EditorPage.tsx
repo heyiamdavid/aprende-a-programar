@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth, UserButton, useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User } from 'lucide-react';
+import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, Target, BrainCircuit, Layout, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import ReactMarkdown from 'react-markdown';
+import Split from 'react-split';
 import { getCodeReview } from '../lib/groq';
 import { CHALLENGES, type Challenge } from '../data/challenges';
 import ProfileModal from '../components/ProfileModal';
@@ -70,6 +72,11 @@ export default function EditorPage() {
   const [pyodideReady, setPyodideReady] = useState(false);
   const [consoleHeight, setConsoleHeight] = useState(200);
   const [showProfile, setShowProfile] = useState(false);
+  const [lessonTab, setLessonTab] = useState<'lesson' | 'reto'>('lesson');
+  type LayoutMode = 'vertical' | 'horizontal' | 'horizontal-reverse';
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('vertical');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [, setRenderTrigger] = useState(0);
 
   const pyodideRef = useRef<any>(null);
   const isDraggingRef = useRef(false);
@@ -123,6 +130,7 @@ export default function EditorPage() {
     const saved = localStorage.getItem(`code_challenge_${ch.id}`);
     setCode(saved !== null ? saved : ch.initialCode);
     setOutput(`Cargado: ${ch.title}\n`);
+    setLessonTab('lesson');
   };
 
   // Resizable terminal
@@ -179,15 +187,26 @@ export default function EditorPage() {
     }
   };
 
+  const handleCompleteChallenge = () => {
+    localStorage.setItem(`done_challenge_${selectedChallenge.id}`, 'true');
+    setRenderTrigger(p => p + 1); // Force re-render to update sidebar checkmark
+  };
+
   if (!isLoaded || !isSignedIn) return null;
 
-  return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)' }}>
-      {/* Sidebar */}
-      <aside className="solid-panel" style={{ width: '300px', margin: '16px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+  const sidebarContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 8px 16px 16px', overflow: 'hidden' }}>
+      <aside className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '2px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <BookOpen size={20} color="var(--accent-primary)" />
-          <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Ruta de Python</h2>
+          <h2 style={{ fontSize: '1.05rem', margin: 0, flex: 1 }}>Ruta de Python</h2>
+          <button
+            onClick={() => navigate('/quiz')}
+            title="Quiz de conocimiento"
+            style={{ background: 'rgba(168,85,247,0.15)', border: '2px solid rgba(168,85,247,0.4)', borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', color: '#a855f7', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-sans)' }}
+          >
+            <BrainCircuit size={15} /> Quiz
+          </button>
         </div>
 
         <div style={{ flex: 1, padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -255,22 +274,104 @@ export default function EditorPage() {
           </button>
         </div>
       </aside>
+    </div>
+  );
 
-      {/* Main area */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: '16px 16px 16px 0', gap: '12px', minWidth: 0 }}>
-        {/* Challenge instructions */}
-        <div className="solid-panel" style={{ padding: '20px 24px' }}>
-          <h1 style={{ margin: '0 0 6px 0', fontSize: '1.3rem', color: 'var(--accent-primary)' }}>{selectedChallenge.title}</h1>
-          <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.93rem' }}>
-            {selectedChallenge.description}
-          </p>
+  const mainContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: isSidebarOpen ? '16px 16px 16px 8px' : '16px', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+      <Split
+            sizes={[35, 65]}
+            minSize={150}
+            gutterSize={10}
+            direction={layoutMode.includes('horizontal') ? 'horizontal' : 'vertical'}
+            style={{ display: 'flex', flexDirection: layoutMode === 'horizontal-reverse' ? 'row-reverse' : (layoutMode === 'horizontal' ? 'row' : 'column'), height: '100%' }}
+          >
+            {/* Top panel: Lesson + Instructions */}
+            <div style={{ overflow: 'hidden', paddingBottom: '4px' }}>
+              <div className="solid-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+          {/* Tab header */}
+          <div style={{ display: 'flex', borderBottom: '2px solid var(--border-color)', alignItems: 'center' }}>
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              title={isSidebarOpen ? "Ocultar panel lateral" : "Mostrar panel lateral"}
+              style={{ padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}
+            >
+              {isSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+            </button>
+            <div style={{ display: 'flex', flex: 1 }}>
+              <button
+                onClick={() => setLessonTab('lesson')}
+                style={{
+                  flex: 1, padding: '10px 16px', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '0.85rem', fontWeight: 700, fontFamily: 'var(--font-sans)',
+                  borderBottom: lessonTab === 'lesson' ? '3px solid var(--accent-primary)' : '3px solid transparent',
+                  color: lessonTab === 'lesson' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', transition: 'color 0.15s',
+                }}
+              >
+                <BookOpen size={15} /> Teoría y Ejemplos
+              </button>
+              <button
+                onClick={() => setLessonTab('reto')}
+                style={{
+                  flex: 1, padding: '10px 16px', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '0.85rem', fontWeight: 700, fontFamily: 'var(--font-sans)',
+                  borderBottom: lessonTab === 'reto' ? '3px solid var(--success)' : '3px solid transparent',
+                  color: lessonTab === 'reto' ? 'var(--success)' : 'var(--text-secondary)',
+                  display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', transition: 'color 0.15s',
+                }}
+              >
+                <Target size={15} /> Tu Reto
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                const modes: LayoutMode[] = ['vertical', 'horizontal', 'horizontal-reverse'];
+                setLayoutMode(p => modes[(modes.indexOf(p) + 1) % modes.length]);
+              }}
+              title={
+                layoutMode === 'vertical' ? "Vista: Arriba/Abajo (Clic para Lado a Lado)" :
+                layoutMode === 'horizontal' ? "Vista: Lado a Lado (Clic para Invertir)" :
+                "Vista: Invertida (Clic para Arriba/Abajo)"
+              }
+              style={{ padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}
+            >
+              <Layout size={18} />
+            </button>
+          </div>
+          {/* Tab content */}
+          <div style={{ overflowY: 'auto', flex: 1, padding: '16px 20px' }}>
+            {lessonTab === 'lesson' ? (
+              <div className="markdown-content">
+                <ReactMarkdown>{selectedChallenge.lesson}</ReactMarkdown>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', flexDirection: 'column' }}>
+                <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--accent-primary)' }}>{selectedChallenge.title}</h2>
+                <div className="markdown-content" style={{ background: 'rgba(88,204,2,0.06)', border: '2px solid rgba(88,204,2,0.25)', borderRadius: '12px', padding: '16px', width: '100%' }}>
+                  <ReactMarkdown>{selectedChallenge.instructions}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+      </div>
 
-        {/* Editor */}
+      {/* Editor & Console Panel */}
+      <div style={{ overflow: 'hidden', paddingTop: '4px', display: 'flex', flexDirection: 'column' }}>
         <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>main.py</span>
             <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={handleCompleteChallenge}
+                className="btn-chunky"
+                style={{ background: 'var(--bg-darker)', color: 'var(--success)', border: '2px solid rgba(88,204,2,0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                title="Marcar como Completado"
+              >
+                <CheckCircle size={18} />
+                Completar
+              </button>
               <button
                 onClick={handleReviewCode}
                 disabled={isReviewing}
@@ -303,7 +404,7 @@ export default function EditorPage() {
         {/* Resize handle */}
         <div
           onMouseDown={handleMouseDown}
-          style={{ height: '8px', cursor: 'ns-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', userSelect: 'none' }}
+          style={{ height: '8px', cursor: 'ns-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', userSelect: 'none', margin: '4px 0' }}
         >
           <GripHorizontal size={14} color="var(--text-secondary)" />
         </div>
@@ -318,7 +419,29 @@ export default function EditorPage() {
             {output}
           </div>
         </div>
-      </main>
+      </div>
+    </Split>
+  </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)' }}>
+      {isSidebarOpen ? (
+        <Split 
+          sizes={[22, 78]} 
+          minSize={250}
+          gutterSize={10}
+          direction="horizontal" 
+          style={{ display: 'flex', width: '100vw', height: '100vh' }}
+        >
+          {sidebarContent}
+          {mainContent}
+        </Split>
+      ) : (
+        <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
+          {mainContent}
+        </div>
+      )}
 
       {/* Profile Modal */}
       {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
