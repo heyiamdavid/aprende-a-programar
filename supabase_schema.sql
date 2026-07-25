@@ -3,7 +3,8 @@
 -- 1. Tabla para almacenar los perfiles de usuario (sincronizado con Clerk de ser necesario)
 CREATE TABLE IF NOT EXISTS public.users (
   id TEXT PRIMARY KEY, -- Usamos TEXT porque Clerk genera IDs tipo 'user_2xyz...'
-  email TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  username TEXT UNIQUE,
   first_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
