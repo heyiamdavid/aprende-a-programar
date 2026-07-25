@@ -5,7 +5,7 @@ import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, 
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import Split from 'react-split';
-import { getCodeReview } from '../lib/groq';
+import { getCodeReview, validateChallengeCompletion } from '../lib/groq';
 import { CHALLENGES, type Challenge } from '../data/challenges';
 import ProfileModal from '../components/ProfileModal';
 
@@ -111,6 +111,8 @@ export default function EditorPage() {
 
   const [output, setOutput] = useState<string>('Salida de consola...');
   const [isReviewing, setIsReviewing] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0); // Cooldown in seconds
   const [pyodideReady, setPyodideReady] = useState(false);
   const [consoleHeight, setConsoleHeight] = useState(200);
   const [showProfile, setShowProfile] = useState(false);
@@ -156,7 +158,16 @@ export default function EditorPage() {
 
     initPyodide();
     return () => { isMounted = false; };
-  }, [isSignedIn]);
+  }, [isSignedIn, ruta]);
+
+  // Cooldown timer logic
+  useEffect(() => {
+    let timer: any;
+    if (cooldownTime > 0) {
+      timer = setInterval(() => setCooldownTime(p => p - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldownTime]);
 
   // Code change + persistence
   const handleCodeChange = (newCode: string | undefined) => {
@@ -236,7 +247,12 @@ export default function EditorPage() {
 
   // AI Review
   const handleReviewCode = async () => {
+    if (cooldownTime > 0) {
+      setOutput(`⏱️ Por favor, espera ${cooldownTime} segundos antes de volver a consultar a la IA.\n`);
+      return;
+    }
     setIsReviewing(true);
+    setCooldownTime(15); // 15 seconds cooldown
     setOutput('🤖 La IA está revisando tu código...\n');
     try {
       const review = await getCodeReview(code, selectedChallenge.title, output);
@@ -248,9 +264,45 @@ export default function EditorPage() {
     }
   };
 
-  const handleCompleteChallenge = () => {
-    localStorage.setItem(`done_challenge_${selectedChallenge.id}`, 'true');
-    setRenderTrigger(p => p + 1); // Force re-render to update sidebar checkmark
+  const handleCompleteChallenge = async () => {
+    if (cooldownTime > 0) {
+      setOutput(`⏱️ Por favor, espera ${cooldownTime} segundos antes de volver a validar con la IA.\n`);
+      return;
+    }
+    setIsCompleting(true);
+    setCooldownTime(10); // 10 seconds cooldown
+    setOutput('🤖 La IA está validando tu código para completar el reto...\n');
+    try {
+      const { success, feedback } = await validateChallengeCompletion(code, selectedChallenge.title, selectedChallenge.instructions);
+      
+      if (success) {
+        setOutput(`✅ ¡RETO COMPLETADO!\n\n${feedback}`);
+        localStorage.setItem(`done_challenge_${selectedChallenge.id}`, 'true');
+        setRenderTrigger(p => p + 1); // Force re-render to update sidebar checkmark
+
+        // Auto-advance
+        const currentIndex = routeChallenges.findIndex(c => c.id === selectedChallenge.id);
+        if (currentIndex !== -1 && currentIndex < routeChallenges.length - 1) {
+          const nextChallenge = routeChallenges[currentIndex + 1];
+          setTimeout(() => {
+            setSelectedChallenge(nextChallenge);
+            const savedCode = localStorage.getItem(`code_challenge_${nextChallenge.id}`);
+            setCode(savedCode !== null ? savedCode : nextChallenge.initialCode);
+            setOutput(`Pasando a la siguiente lección: ${nextChallenge.title}\n`);
+          }, 3000);
+        } else {
+          setTimeout(() => {
+            setOutput(`¡Felicidades! Has completado todos los retos de la ruta ${routeLabel}.\n`);
+          }, 2000);
+        }
+      } else {
+        setOutput(`❌ AÚN TE FALTAN DETALLES:\n\n${feedback}\n\nCorrige tu código y vuelve a intentarlo.`);
+      }
+    } catch (e: any) {
+      setOutput(`Error en la validación: ${e.message ?? e}`);
+    } finally {
+      setIsCompleting(false);
+    }
   };
 
   if (!isLoaded || !isSignedIn) return null;
@@ -439,20 +491,22 @@ export default function EditorPage() {
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={handleCompleteChallenge}
+                disabled={isCompleting || cooldownTime > 0}
                 className="btn-chunky"
-                style={{ background: 'var(--bg-darker)', color: 'var(--success)', border: '2px solid rgba(88,204,2,0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
-                title="Marcar como Completado"
+                style={{ background: 'var(--bg-darker)', color: cooldownTime > 0 ? 'var(--text-secondary)' : 'var(--success)', border: '2px solid rgba(88,204,2,0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                title={cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Validar y Completar'}
               >
                 <CheckCircle size={18} />
-                Completar
+                {isCompleting ? 'Validando...' : cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Completar'}
               </button>
               <button
                 onClick={handleReviewCode}
-                disabled={isReviewing}
+                disabled={isReviewing || cooldownTime > 0}
                 className="btn-chunky btn-primary"
+                title={cooldownTime > 0 ? `Espera ${cooldownTime}s` : 'Revisión IA'}
               >
                 <Sparkles size={18} />
-                {isReviewing ? 'Revisando...' : 'Revisión IA'}
+                {isReviewing ? 'Revisando...' : cooldownTime > 0 ? `IA (${cooldownTime}s)` : 'Revisión IA'}
               </button>
               <button
                 onClick={handleRunCode}

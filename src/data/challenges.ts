@@ -31,7 +31,7 @@ print("Esto es un programa")
 
 > 💡 **Nota:** El texto que quieras mostrar siempre debe ir entre comillas (\`"\`) o apóstrofes (\`'\`).`,
     instructions: `**Tu reto:** Modifica el código de abajo para que imprima **tu nombre** en lugar de \`¡Hola Mundo!\`.`,
-    initialCode: 'print("¡Hola Mundo!")'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 2,
@@ -62,7 +62,7 @@ edad = 22
 print(f"Tengo {edad} años")  # Imprime: Tengo 22 años
 \`\`\``,
     instructions: `**Tu reto:** Usa \`input()\` para pedir el nombre del usuario y luego imprímelo con un saludo usando un f-string. Por ejemplo: \`¡Hola, David!\``,
-    initialCode: '# Pide el nombre al usuario e imprímelo\nnombre = input("¿Cuál es tu nombre? ")\nprint(f"¡Hola, {nombre}!")'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -101,7 +101,7 @@ else:
 
 > ⚠️ La indentación (4 espacios) es **obligatoria** en Python. Sin ella, el programa falla.`,
     instructions: `**Tu reto:** Pide la edad al usuario con \`input()\`. Si la edad es mayor o igual a 18, imprime \`"Eres mayor de edad"\`. De lo contrario, imprime \`"Eres menor de edad"\`.`,
-    initialCode: 'edad = int(input("Ingresa tu edad: "))\n\nif edad >= 18:\n    print("Eres mayor de edad")\nelse:\n    print("Eres menor de edad")'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 4,
@@ -134,7 +134,7 @@ print(palabra.upper())   # PYTHON
 print(palabra.capitalize()) # Python
 \`\`\``,
     instructions: `**Tu reto:** Crea una lista con al menos 4 frutas. Usa un bucle \`for\` para imprimir cada fruta en **mayúsculas** usando el método \`.upper()\`.`,
-    initialCode: 'frutas = ["manzana", "banana", "cereza", "uva"]\n\nfor fruta in frutas:\n    print(fruta.upper())'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -169,7 +169,7 @@ print(resultado)  # 20
 
 > 💡 **Buena práctica:** Una función debe hacer **una sola cosa** y hacerla bien (Principio de Responsabilidad Única - SRP).`,
     instructions: `**Tu reto:** Crea una función llamada \`suma\` que pida dos números al usuario con \`input()\`, los sume e imprima el resultado. Luego llama a la función.`,
-    initialCode: 'def suma():\n    num1 = int(input("Ingresa un número: "))\n    num2 = int(input("Ingresa otro número: "))\n    resultado = num1 + num2\n    print(f"Su suma es: {resultado}")\n    return resultado\n\nsuma()'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 6,
@@ -200,7 +200,7 @@ persona["edad"] = 31                   # Modificar
 del persona["ciudad"]                  # Eliminar
 \`\`\``,
     instructions: `**Tu reto:** Crea un diccionario llamado \`usuario\` con las llaves \`"nombre"\`, \`"edad"\` y \`"lenguaje"\`. Luego imprime un mensaje que diga algo como: \`"El usuario David aprende Python."\``,
-    initialCode: 'usuario = {\n    "nombre": "David",\n    "edad": 22,\n    "lenguaje": "Python"\n}\n\nprint(f"El usuario {usuario[\'nombre\']} aprende {usuario[\'lenguaje\']}.")'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -230,7 +230,7 @@ mi_carro = Carro("Toyota", "Corolla")
 mi_carro.describirse()  # Soy un Toyota Corolla
 \`\`\``,
     instructions: `**Tu reto:** Crea una clase \`Persona\` con atributos \`nombre\` y \`edad\`. Agrégale un método \`presentarse()\` que imprima algo como: \`"Hola, soy Ana y tengo 25 años."\`. Crea al menos un objeto y llama al método.`,
-    initialCode: 'class Persona:\n    def __init__(self, nombre, edad):\n        self.nombre = nombre\n        self.edad = edad\n        \n    def presentarse(self):\n        print(f"Hola, soy {self.nombre} y tengo {self.edad} años.")\n\np1 = Persona("Ana", 25)\np1.presentarse()'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 8,
@@ -259,7 +259,7 @@ print(mi_caja.ver_contenido())  # "secreto"
 
 > 🔒 La idea es que el acceso a los datos pase siempre por los **métodos que tú controlas**.`,
     instructions: `**Tu reto:** Crea una clase \`Cuenta\` con un atributo privado \`__saldo\` iniciado en 0. Agrega los métodos \`depositar(monto)\` (que valide que el monto sea positivo) y \`obtener_saldo()\`. Pruébala creando un objeto y depositando dinero.`,
-    initialCode: 'class Cuenta:\n    def __init__(self):\n        self.__saldo = 0\n        \n    def depositar(self, monto):\n        if monto > 0:\n            self.__saldo += monto\n            \n    def obtener_saldo(self):\n        return self.__saldo\n\nmi_cuenta = Cuenta()\nmi_cuenta.depositar(100)\nprint("Saldo:", mi_cuenta.obtener_saldo())'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 9,
@@ -289,7 +289,7 @@ for v in [Bicicleta(), Avion()]:
 
 > **Polimorfismo** significa que objetos distintos pueden responder al mismo método de formas diferentes.`,
     instructions: `**Tu reto:** Crea una clase base \`Animal\` con un método \`hacer_sonido()\`. Luego crea \`Perro\` y \`Gato\` que hereden de \`Animal\` y sobrescriban ese método. Crea una lista con ambos y recórrela imprimiendo el sonido de cada uno.`,
-    initialCode: 'class Animal:\n    def hacer_sonido(self):\n        pass\n\nclass Perro(Animal):\n    def hacer_sonido(self):\n        return "¡Guau!"\n\nclass Gato(Animal):\n    def hacer_sonido(self):\n        return "¡Miau!"\n\nmascotas = [Perro(), Gato()]\nfor mascota in mascotas:\n    print(mascota.hacer_sonido())'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -327,7 +327,7 @@ mostrar_resultado(n, e)
 
 > 💡 Si necesitas cambiar cómo se piden los datos, solo tocas \`obtener_datos()\`. Si cambias el formato de salida, solo tocas \`mostrar_resultado()\`.`,
     instructions: `**Tu reto:** Refactoriza el siguiente código para aplicar SRP. Crea funciones separadas: una que pida los datos (\`obtener_numeros\`) y otra que realice el cálculo (\`calcular_suma\`).`,
-    initialCode: 'def obtener_numeros():\n    a = int(input("Número 1: "))\n    b = int(input("Número 2: "))\n    return a, b\n\ndef calcular_suma(a, b):\n    return a + b\n\nn1, n2 = obtener_numeros()\nprint(f"Resultado: {calcular_suma(n1, n2)}")'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -356,7 +356,7 @@ finally:
 
 > 💡 **Tip:** Nunca dejes un \`except:\` vacío. Siempre es mejor especificar qué tipo de error estás capturando (ej. \`ValueError\`, \`ZeroDivisionError\`).`,
     instructions: `**Tu reto:** Crea una función llamada \`dividir_seguro(a, b)\` que intente devolver el resultado de \`a / b\`. Si \`b\` es cero, debe capturar el \`ZeroDivisionError\` e imprimir \`"Error: No se puede dividir entre cero"\`. Devuelve \`None\` en ese caso.`,
-    initialCode: 'def dividir_seguro(a, b):\n    # TODO: Usa try/except para manejar la división por cero\n    pass\n\nprint(dividir_seguro(10, 2))  # 5.0\nprint(dividir_seguro(10, 0))  # Error: No se puede dividir entre cero\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 12,
@@ -387,7 +387,7 @@ from datetime import datetime
 print(datetime.now())
 \`\`\``,
     instructions: `**Tu reto:** Importa el módulo \`math\` y el módulo \`random\`. Luego, genera un número aleatorio entre 1 y 100, y calcula su raíz cuadrada usando \`math.sqrt()\`. Imprime el resultado.`,
-    initialCode: '# TODO: Importa los módulos necesarios\n\n# TODO: Genera un número aleatorio entre 1 y 100\nnumero = 0\n\n# TODO: Calcula su raíz cuadrada e imprímela\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 13,
@@ -417,7 +417,7 @@ pares = list(filter(lambda x: x % 2 == 0, numeros))
 # [2, 4]
 \`\`\``,
     instructions: `**Tu reto:** Dada la lista \`precios = [15, 50, 120, 80, 200]\`, usa \`filter\` y una \`lambda\` para obtener una lista solo con los precios **mayores a 100**. Imprime la nueva lista.`,
-    initialCode: 'precios = [15, 50, 120, 80, 200]\n\n# TODO: Usa filter y lambda para obtener precios mayores a 100\nprecios_altos = []\n\nprint(precios_altos)\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -451,7 +451,7 @@ cuenta.mostrar_historial()
 
 > 🤖 **Consejo:** Ejecuta tu código primero para ver los errores en la consola, y luego usa **"Revisión IA"** para que la IA te explique exactamente qué falló y cómo mejorar tu diseño.`,
     instructions: `**Tu reto:** Implementa los métodos \`depositar(monto)\`, \`retirar(monto)\` y \`mostrar_historial()\` en la clase \`CuentaBancaria\`. Cada operación debe quedar registrada en el historial.`,
-    initialCode: 'class CuentaBancaria:\n    def __init__(self, titular, saldo_inicial=0):\n        self.titular = titular\n        self.__saldo = saldo_inicial\n        self.historial = []\n\n    def depositar(self, monto):\n        # TODO: Implementar validación y agregar al historial\n        pass\n        \n    def retirar(self, monto):\n        # TODO: Verificar si hay saldo suficiente y descontar\n        pass\n\n    def mostrar_historial(self):\n        # TODO: Imprimir cada transacción del historial\n        pass\n\n# Prueba tu código aquí:\ncuenta = CuentaBancaria("David")\ncuenta.depositar(500)\ncuenta.retirar(200)\ncuenta.retirar(1000)\ncuenta.mostrar_historial()'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -492,7 +492,7 @@ z = round(3.567, 2)  # 3.57 (redondea a 2 decimales)
 
 > 💡 Usa \`type(variable)\` para saber el tipo de cualquier valor.`,
     instructions: `**Tu reto:** Crea una calculadora de IMC (Índice de Masa Corporal). Pide el peso en kg y la altura en metros, calcula el IMC con la fórmula \`imc = peso / (altura ** 2)\`, redondéalo a 2 decimales e imprímelo.`,
-    initialCode: '# Calculadora de IMC\npeso = float(input("Peso en kg: "))\naltura = float(input("Altura en metros: "))\n\n# TODO: Calcula el IMC y redondéalo a 2 decimales\nimc = 0\n\nprint(f"Tu IMC es: {imc}")\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 16,
@@ -538,7 +538,7 @@ edad = 22
 print(f"Me llamo {nombre} y tengo {edad} años.")
 \`\`\``,
     instructions: `**Tu reto:** Dada la variable \`frase = "la programacion es increible"\`, imprímela: 1) en mayúsculas, 2) con la primera letra de cada palabra en mayúscula (\`title()\`), 3) invertida (de atrás hacia adelante), y 4) cuántas letras 'a' contiene.`,
-    initialCode: 'frase = "la programacion es increible"\n\n# 1. En mayúsculas\n\n# 2. Primera letra de cada palabra en mayúscula\n\n# 3. Invertida\n\n# 4. Cuántas letras "a" contiene\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 17,
@@ -587,7 +587,7 @@ puede_manejar = edad >= 18 and tiene_carnet
 print(f"¿Puede manejar? {puede_manejar}")  # True
 \`\`\``,
     instructions: `**Tu reto:** Crea una función \`validar_contrasena(pwd)\` que retorne \`True\` si la contraseña cumple: 1) tiene al menos 8 caracteres, 2) contiene al menos un número (usa \`any(c.isdigit() for c in pwd)\`). Si cumple ambas, imprime "Contraseña válida", si no "Contraseña débil".`,
-    initialCode: 'def validar_contrasena(pwd):\n    # TODO: Verificar largo >= 8 y que contenga al menos un dígito\n    pass\n\nprint(validar_contrasena("abc123"))    # Contraseña débil (menos de 8 caracteres)\nprint(validar_contrasena("python123")) # Contraseña válida\nprint(validar_contrasena("sinNumeros"))# Contraseña débil (no tiene número)\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -634,7 +634,7 @@ for i in range(10):
 # Imprime: 0, 1, 2, 4, 5, 6
 \`\`\``,
     instructions: `**Tu reto:** Crea un juego de "adivina el número". Genera un número aleatorio entre 1 y 10 usando \`random.randint(1, 10)\`. Usa \`while True\` para pedir adivinanzas. Cada intento indica si el número es mayor o menor. Cuando adivine, muestra cuántos intentos tardó y sale del bucle.`,
-    initialCode: 'import random\n\nnumero_secreto = random.randint(1, 10)\nintentos = 0\n\n# TODO: Implementar el juego con while True\n# - Pedir un número al usuario\n# - Incrementar intentos\n# - Indicar si es mayor, menor o correcto\n# - Salir con break cuando adivine\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 19,
@@ -675,7 +675,7 @@ match codigo_http:
         print(f"Código desconocido: {codigo_http}")
 \`\`\``,
     instructions: `**Tu reto:** Crea una función \`clasificar_nota(nota)\` que use \`match/case\` para clasificar: 10 = "Excelente", 9 = "Muy Bueno", 7 o 8 = "Bueno", 5 o 6 = "Suficiente", cualquier otro valor = "Reprobado". Pruébala con varias notas.`,
-    initialCode: 'def clasificar_nota(nota):\n    match nota:\n        # TODO: Completar los casos\n        case _:\n            return "Reprobado"\n\nprint(clasificar_nota(10))  # Excelente\nprint(clasificar_nota(8))   # Bueno\nprint(clasificar_nota(5))   # Suficiente\nprint(clasificar_nota(3))   # Reprobado\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -725,7 +725,7 @@ cuadrados = [n**2 for n in range(1, 6)]
 # [1, 4, 9, 16, 25]
 \`\`\``,
     instructions: `**Tu reto:** Dada la lista \`notas = [7, 4, 9, 6, 10, 3, 8, 5]\`, debes: 1) Ordenarla de mayor a menor, 2) Calcular el promedio, 3) Filtrar solo las notas aprobadas (>= 6) usando list comprehension, 4) Imprimir cuántos aprobaron y cuántos reprobaron.`,
-    initialCode: 'notas = [7, 4, 9, 6, 10, 3, 8, 5]\n\n# 1. Ordenar de mayor a menor\n\n# 2. Calcular el promedio\n\n# 3. Filtrar aprobados (>= 6) con list comprehension\n\n# 4. Imprimir cuántos aprobaron y reprobaron\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 21,
@@ -767,7 +767,7 @@ print(A | B)   # {1,2,3,4,5,6} → Unión
 print(A - B)   # {1, 2}      → Diferencia
 \`\`\``,
     instructions: `**Tu reto:** Tienes dos listas de estudiantes: \`grupo_A = ["Ana", "Luis", "Pedro", "María"]\` y \`grupo_B = ["Luis", "María", "Sofía", "Carlos"]\`. Conviértelas a sets y encuentra: 1) Estudiantes en ambos grupos, 2) Estudiantes solo en el grupo A, 3) Todos los estudiantes sin repetir.`,
-    initialCode: 'grupo_A = ["Ana", "Luis", "Pedro", "María"]\ngrupo_B = ["Luis", "María", "Sofía", "Carlos"]\n\n# Convierte a sets\nset_A = set(grupo_A)\nset_B = set(grupo_B)\n\n# 1. Estudiantes en AMBOS grupos (intersección)\n\n# 2. Estudiantes SOLO en grupo A (diferencia)\n\n# 3. TODOS los estudiantes sin repetir (unión)\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -821,7 +821,7 @@ precios = {"manzana": 1.2, "pera": 0.8, "uva": 2.5}
 nuevos_precios = {k: round(v * 1.1, 2) for k, v in precios.items()}
 \`\`\``,
     instructions: `**Tu reto:** Tienes una lista de ventas: \`ventas = [("manzana", 5), ("pera", 3), ("manzana", 2), ("uva", 7), ("pera", 1)]\`. Agrupa las ventas por producto en un diccionario donde la clave sea el producto y el valor sea el total vendido. Luego imprime el producto más vendido.`,
-    initialCode: 'ventas = [("manzana", 5), ("pera", 3), ("manzana", 2), ("uva", 7), ("pera", 1)]\n\n# TODO: Crear un diccionario con totales por producto\ntotales = {}\n\nfor producto, cantidad in ventas:\n    # Si el producto ya existe, suma; si no, inicializa en 0\n    pass\n\n# TODO: Imprimir el producto más vendido usando max()\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -873,7 +873,7 @@ class SaldoInsuficienteError(Exception):
 raise SaldoInsuficienteError(100, 200)
 \`\`\``,
     instructions: `**Tu reto:** Crea una función \`convertir_lista(datos)\` que reciba una lista con valores mixtos (ej: \`["1", "dos", "3", None, "4.5"]\`) e intente convertir cada elemento a número. Si falla, lo omite. Retorna una lista solo con los números convertidos correctamente.`,
-    initialCode: 'def convertir_lista(datos):\n    resultado = []\n    for item in datos:\n        try:\n            # TODO: Intentar convertir a float y agregar al resultado\n            pass\n        except (ValueError, TypeError):\n            # TODO: Ignorar los que no se puedan convertir\n            pass\n    return resultado\n\ndatos = ["1", "dos", "3", None, "4.5", "hola", "10"]\nprint(convertir_lista(datos))  # [1.0, 3.0, 4.5, 10.0]\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -927,7 +927,7 @@ with open("datos.txt", "r") as archivo:
 
 > 💡 Siempre usa \`with open(...)\` — cierra el archivo automáticamente aunque haya un error.`,
     instructions: `**Tu reto:** Simula un registro de estudiantes. 1) Crea una lista con 5 nombres de estudiantes. 2) Escríbelos en un archivo llamado \`"estudiantes.txt"\`, uno por línea. 3) Lee el archivo y muestra cada nombre numerado (ej: "1. Ana"). 4) Muestra cuántos estudiantes hay en total.`,
-    initialCode: '# Registro de estudiantes\nestudiantes = ["Ana García", "Luis Pérez", "María López", "Carlos Ruiz", "Sofía Torres"]\n\n# 1. Escribir en archivo\nwith open("estudiantes.txt", "w", encoding="utf-8") as f:\n    # TODO: Escribir cada estudiante en una línea\n    pass\n\n# 2. Leer y mostrar numerados\nprint("=== Lista de Estudiantes ===")\nwith open("estudiantes.txt", "r", encoding="utf-8") as f:\n    # TODO: Leer e imprimir cada línea numerada\n    pass\n\n# 3. Contar estudiantes\nprint(f"\\nTotal: {len(estudiantes)} estudiantes")\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -976,7 +976,7 @@ Sistema
 3. **Clase \`UsuarioFactory\`** con método estático \`crear_usuario(tipo, nombre)\` que retorne la instancia correcta.
 4. **Clase \`Prestamo\`** que almacene un usuario y el título del libro, con método \`info()\` que muestre los datos del préstamo.
 5. **Clase \`Sistema\`** con lista de préstamos, método \`registrar(tipo, nombre, libro)\` y \`mostrar_todos()\`.`,
-    initialCode: 'from abc import ABC, abstractmethod\n\n# ─── CLASE ABSTRACTA ───────────────────────\nclass Usuario(ABC):\n    def __init__(self, nombre):\n        self.__nombre = nombre  # Encapsulado\n\n    @property\n    def nombre(self):\n        return self.__nombre\n\n    @abstractmethod\n    def dias_prestamo(self):\n        pass  # Las subclases deben implementar esto\n\n# ─── SUBCLASES ─────────────────────────────\nclass Estudiante(Usuario):\n    def dias_prestamo(self):\n        # TODO: Retornar 7\n        pass\n\nclass Docente(Usuario):\n    def dias_prestamo(self):\n        # TODO: Retornar 15\n        pass\n\n# ─── FACTORY METHOD ────────────────────────\nclass UsuarioFactory:\n    @staticmethod\n    def crear_usuario(tipo, nombre):\n        # TODO: Retornar Estudiante o Docente según "tipo"\n        pass\n\n# ─── PRÉSTAMO ──────────────────────────────\nclass Prestamo:\n    def __init__(self, usuario, libro):\n        self.usuario = usuario\n        self.libro = libro\n\n    def info(self):\n        # TODO: Imprimir nombre, libro y días de préstamo\n        pass\n\n# ─── SISTEMA ───────────────────────────────\nclass Sistema:\n    def __init__(self):\n        self.prestamos = []\n\n    def registrar(self, tipo, nombre, libro):\n        # TODO: Usar UsuarioFactory para crear usuario y registrar préstamo\n        pass\n\n    def mostrar_todos(self):\n        # TODO: Mostrar todos los préstamos registrados\n        pass\n\n# ─── PRUEBA ────────────────────────────────\nsistema = Sistema()\nsistema.registrar("estudiante", "Ana García", "Python Crash Course")\nsistema.registrar("docente", "Dr. Pérez", "Clean Code")\nsistema.registrar("estudiante", "Luis Ruiz", "Automate the Boring Stuff")\nsistema.mostrar_todos()\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
   {
     id: 26,
@@ -1018,7 +1018,7 @@ ReporteVentas (Observer)
 3. **Clase \`AlertaStockBajo\`** que implemente Observer: imprime alerta si stock < 5.
 4. **Clase \`ReporteVentas\`** que implemente Observer: registra cada cambio en una lista.
 5. **Clase \`Inventario\`** (Subject) con diccionario de productos, lista de observers, y métodos: \`agregar_observer\`, \`notificar_observers\`, \`agregar_stock(producto, cantidad)\`, \`vender(producto, cantidad)\` (lanza excepción si no hay stock).`,
-    initialCode: 'from abc import ABC, abstractmethod\n\n# ─── EXCEPCIÓN PROPIA ──────────────────────\nclass StockInsuficienteError(Exception):\n    def __init__(self, producto, disponible, solicitado):\n        super().__init__(\n            f"Stock insuficiente para {producto}: disponible={disponible}, solicitado={solicitado}"\n        )\n\n# ─── OBSERVER ABSTRACTO ────────────────────\nclass Observer(ABC):\n    @abstractmethod\n    def actualizar(self, producto, stock):\n        pass\n\n# ─── OBSERVADORES CONCRETOS ────────────────\nclass AlertaStockBajo(Observer):\n    def actualizar(self, producto, stock):\n        # TODO: Si stock < 5, imprimir alerta\n        pass\n\nclass ReporteVentas(Observer):\n    def __init__(self):\n        self.registros = []\n\n    def actualizar(self, producto, stock):\n        # TODO: Agregar registro a self.registros\n        pass\n\n    def mostrar_reporte(self):\n        # TODO: Imprimir todos los registros\n        pass\n\n# ─── INVENTARIO (SUBJECT) ──────────────────\nclass Inventario:\n    def __init__(self):\n        self.__productos = {}  # {nombre: stock}\n        self.__observers = []\n\n    def agregar_observer(self, observer):\n        self.__observers.append(observer)\n\n    def notificar_observers(self, producto, stock):\n        for obs in self.__observers:\n            obs.actualizar(producto, stock)\n\n    def agregar_stock(self, producto, cantidad):\n        # TODO: Agregar stock y notificar\n        pass\n\n    def vender(self, producto, cantidad):\n        # TODO: Validar stock, descontar y notificar. Lanzar StockInsuficienteError si no alcanza\n        pass\n\n# ─── PRUEBA ────────────────────────────────\nalerta = AlertaStockBajo()\nreporte = ReporteVentas()\n\ninventario = Inventario()\ninventario.agregar_observer(alerta)\ninventario.agregar_observer(reporte)\n\ninventario.agregar_stock("Laptop", 10)\ninventario.vender("Laptop", 7)   # Queda 3 → debe alertar\ntry:\n    inventario.vender("Laptop", 5) # No hay suficiente → excepción\nexcept StockInsuficienteError as e:\n    print(f"Error: {e}")\n\nreporte.mostrar_reporte()\n'
+    initialCode: '# TODO: Resuelve el reto aquí\n'
   },
 
   // ─────────────────────────────────────────────
@@ -1693,6 +1693,51 @@ async function obtenerDatos() {
 5. Maneja los errores con try/catch (ej. si el pokemon no existe).
 6. Llama a tu función con "pikachu" y luego con "pokemonfalso".`,
     initialCode: 'async function obtenerPokemon(nombre) {\n  // TODO: try/catch\n  // TODO: fetch a la PokeAPI\n  // TODO: Convertir a json e imprimir nombre y peso\n}\n\nobtenerPokemon("pikachu");\nobtenerPokemon("pokemonfalso");\n'
+  },
+  {
+    id: 39,
+    title: "39. Reto Jefe: Cafetería (Factory Method)",
+    category: "Proyectos POO",
+    type: "project",
+    lesson: `## Proyecto Final: Sistema de Cafetería con Patrones de Diseño
+
+Este es un **proyecto completo** que une todo lo que has aprendido de Programación Orientada a Objetos: Abstracción, Herencia, Polimorfismo, Encapsulamiento y Patrones de Diseño.
+
+> [!WARNING]
+> **Atención con Tkinter:** Este reto te pide construir una interfaz usando \`tkinter\`. Puesto que estás programando dentro de una web, \`tkinter\` **no va a funcionar si le das al botón Ejecutar**. Sin embargo, esto es un entorno de aprendizaje: escribe todo tu código de la interfaz gráfica y de la lógica de negocio, y cuando termines, haz clic en **Completar**. La IA analizará tu estructura, validará si aplicaste bien los principios SOLID y el Factory Method, y te evaluará. ¡Para probar tu interfaz gráfica, copia tu código y córrelo en tu computadora localmente!
+
+### El Patrón Factory Method
+El Factory Method es un patrón creacional. En lugar de instanciar las clases directamente usando \`new\` o el nombre de la clase (ej. \`ParaLlevar(cliente, producto, precio)\`), usamos una clase "Fábrica" que se encarga de decidir qué objeto instanciar. Esto facilita agregar nuevos tipos de servicios en el futuro sin modificar la interfaz gráfica.`,
+    instructions: `**Descripción del Problema:**
+Una cafetería requiere un sistema que permita registrar pedidos de clientes según el tipo de servicio, mediante una interfaz gráfica desarrollada en Python con Tkinter.
+
+El sistema deberá desarrollarse bajo POO y aplicar el patrón de diseño **Factory Method** para la creación de los distintos tipos de servicio.
+
+**El desarrollo deberá evidenciar:**
+- Abstracción mediante clases abstractas.
+- Herencia para definir los distintos tipos de servicio.
+- Polimorfismo en el comportamiento de los objetos creados.
+- Encapsulamiento de atributos utilizando propiedades (\`@property\`).
+- Aplicación de un patrón de diseño (Factory Method recomendado).
+- Aplicación de al menos tres principios SOLID, debidamente comentados.
+- Separación de responsabilidades entre lógica de negocio y GUI.
+
+**Requerimientos:**
+1. **Clase Abstracta \`Servicio\`**:
+   - Atributos encapsulados con \`@property\`: \`nombre_cliente\`, \`producto\`, \`precio\`.
+   - Método abstracto \`calcular_total()\`.
+2. **Clases \`ParaLlevar\` y \`ConsumirLocal\`**:
+   - Heredan de \`Servicio\` e implementan \`calcular_total()\`.
+   - Para llevar: sin recargo. Consumir local: 10% de recargo al precio.
+3. **Clase \`ServicioFactory\`**:
+   - Debe contener \`crear_servicio(tipo, cliente, producto, precio)\` que retorna la instancia correcta.
+4. **Clase \`Pedido\`**:
+   - Almacena el servicio (Cliente, Producto, Precio, Tipo) y expone la info.
+5. **Clase \`AppPedidos\` (Interfaz Tkinter)**:
+   - Campos de entrada para nombre, producto, precio.
+   - Selector (Radiobuttons o Combobox) para tipo de servicio.
+   - Botón "Registrar pedido" que usa la Fábrica y actualiza una Lista (Listbox/Treeview) mostrando el total a pagar.`,
+    initialCode: 'import tkinter as tk\nfrom tkinter import ttk, messagebox\nfrom abc import ABC, abstractmethod\n\n# ==========================================\n# 1. LÓGICA DE NEGOCIO (MODELO)\n# ==========================================\n\n# TODO: Implementar clase abstracta Servicio y clases hijas (SOLID: SRP, OCP)\n\n\n# TODO: Implementar ServicioFactory (Patrón Factory Method)\n\n\n# TODO: Implementar clase Pedido\n\n\n# ==========================================\n# 2. INTERFAZ GRÁFICA (VISTA / CONTROLADOR)\n# ==========================================\n\nclass AppPedidos:\n    def __init__(self, root):\n        self.root = root\n        self.root.title("Sistema de Cafetería")\n        # TODO: Construir la interfaz (Labels, Entries, Combobox, Button, Listbox)\n        \n    def registrar_pedido(self):\n        pass\n        # TODO: Leer datos de la interfaz\n        # TODO: Usar ServicioFactory para crear el servicio\n        # TODO: Mostrar en la interfaz y confirmar\n\n# Bloque principal\nif __name__ == "__main__":\n    # root = tk.Tk()\n    # app = AppPedidos(root)\n    # root.mainloop()\n    print("Recuerda: Tkinter no se ejecutará en la web. ¡Dale a \\\'Completar\\\' para que la IA evalúe tu código!")\n'
   }
 ];
 
