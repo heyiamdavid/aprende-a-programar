@@ -170,7 +170,7 @@ export default function EditorPage() {
     setIsReviewing(true);
     setOutput('🤖 La IA está revisando tu código...\n');
     try {
-      const review = await getCodeReview(code, selectedChallenge.title);
+      const review = await getCodeReview(code, selectedChallenge.title, output);
       setOutput(`[Revisión de IA]:\n\n${review}`);
     } catch (e: any) {
       setOutput(`Error en la revisión: ${e.message ?? e}`);
@@ -191,36 +191,48 @@ export default function EditorPage() {
         </div>
 
         <div style={{ flex: 1, padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {CHALLENGES.map((ch) => {
-            const isActive = ch.id === selectedChallenge.id;
-            const isDone = localStorage.getItem(`done_challenge_${ch.id}`) === 'true';
-            const hasSaved = localStorage.getItem(`code_challenge_${ch.id}`) !== null;
-            return (
-              <div
-                key={ch.id}
-                onClick={() => handleSelectChallenge(ch)}
-                style={{
-                  padding: '12px 14px', borderRadius: '12px', cursor: 'pointer',
-                  background: isActive ? 'var(--bg-hover)' : 'transparent',
-                  border: `2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'}`,
-                  transition: 'all 0.1s',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 500, flex: 1 }}>{ch.title}</span>
-                  {isDone && <CheckCircle size={16} color="var(--success)" style={{ flexShrink: 0, marginLeft: '8px' }} />}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--accent-primary)', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
-                    {ch.category}
-                  </span>
-                  {hasSaved && !isDone && (
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>En progreso</span>
-                  )}
-                </div>
+          {Object.entries(
+            CHALLENGES.reduce((acc, ch) => {
+              if (!acc[ch.category]) acc[ch.category] = [];
+              acc[ch.category].push(ch);
+              return acc;
+            }, {} as Record<string, typeof CHALLENGES>)
+          ).map(([category, challenges]) => (
+            <div key={category} style={{ marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', paddingLeft: '8px', fontWeight: 700 }}>
+                {category}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {challenges.map((ch) => {
+                  const isActive = ch.id === selectedChallenge.id;
+                  const isDone = localStorage.getItem(`done_challenge_${ch.id}`) === 'true';
+                  const hasSaved = localStorage.getItem(`code_challenge_${ch.id}`) !== null;
+                  return (
+                    <div
+                      key={ch.id}
+                      onClick={() => handleSelectChallenge(ch)}
+                      style={{
+                        padding: '10px 12px', borderRadius: '10px', cursor: 'pointer',
+                        background: isActive ? 'var(--bg-hover)' : 'transparent',
+                        border: `2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'}`,
+                        transition: 'all 0.1s',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: isActive ? 600 : 500, flex: 1, color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{ch.title}</span>
+                        {isDone && <CheckCircle size={14} color="var(--success)" style={{ flexShrink: 0, marginLeft: '8px', marginTop: '2px' }} />}
+                      </div>
+                      {hasSaved && !isDone && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', background: 'rgba(28,176,246,0.1)', padding: '2px 6px', borderRadius: '4px' }}>En progreso</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         {/* User profile footer */}

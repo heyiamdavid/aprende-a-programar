@@ -1,17 +1,25 @@
-export const getCodeReview = async (code: string, challenge: string): Promise<string> => {
+export const getCodeReview = async (code: string, challenge: string, consoleOutput: string = ""): Promise<string> => {
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
   if (!apiKey) {
     return "Error: No se ha configurado VITE_GROQ_API_KEY en las variables de entorno.";
   }
 
-  const prompt = `Eres un profesor experto en Python y principios SOLID de programación.
-Revisa el siguiente código del estudiante. 
-El reto actual es: "${challenge}". 
-Por favor, sé breve, amigable, claro y da consejos prácticos sobre cómo mejorar el código, aplicando buenas prácticas y principios SOLID si aplica.
+  const prompt = `Eres un profesor experto en Python, Arquitectura de Software, y Programación Orientada a Objetos (POO).
+El estudiante está intentando resolver el reto: "${challenge}".
+
+Actúa como un mentor estricto pero amable:
+1. Evalúa si el código aplica correctamente principios SOLID y buenas prácticas de POO.
+2. Si la consola tiene ERRORES (Tracebacks), explica exactamente en qué línea falló y por qué ocurrió.
+3. Si el código no tiene errores, señala qué cosas están bien y qué se podría refactorizar para ser más limpio.
 
 Código del estudiante:
 \`\`\`python
 ${code}
+\`\`\`
+
+Salida de la Consola (lo que vio el estudiante al ejecutar):
+\`\`\`
+${consoleOutput.trim() || "No se detectó salida en la consola (quizás no imprimió nada o no lo ejecutó)."}
 \`\`\`
 `;
 
