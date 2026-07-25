@@ -63,8 +63,10 @@ export default function SignUpPage() {
       </div>
 
       {/* Right: Clerk form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', minWidth: '480px' }}>
-        <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" appearance={clerkAppearance} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px', minWidth: '480px', overflowY: 'auto' }}>
+        <div style={{ margin: 'auto' }}>
+          <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" appearance={clerkAppearance} />
+        </div>
       </div>
     </div>
   );
