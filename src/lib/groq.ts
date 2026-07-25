@@ -113,3 +113,41 @@ ${trimCode(code, 2000)}
     return { success: false, feedback: `Error de red: ${error.message}` };
   }
 };
+
+export const getHints = async (challenge: string, instructions: string, code: string): Promise<string> => {
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+  if (!apiKey) return "Error: No se ha configurado VITE_GROQ_API_KEY.";
+
+  const prompt = `Eres un tutor de programación que da pistas progresivas.
+Reto: "${challenge}"
+Objetivo: ${instructions.slice(0, 500)}
+Código actual del estudiante:
+\`\`\`
+${trimCode(code, 1500)}
+\`\`\`
+
+Da exactamente 3 pistas numeradas para ayudar al estudiante a resolver el reto, SIN dar la solución completa.
+- Pista 1: Una pista conceptual (¿qué concepto necesita aplicar?)
+- Pista 2: Una pista estructural (¿qué estructura de código debería usar?)
+- Pista 3: Una pista más concreta (un fragmento pequeño o ejemplo similar pero diferente al del reto)
+
+Sé breve. Máx 4 oraciones por pista. Usa formato markdown con ## para cada pista.`;
+
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.6,
+        max_tokens: 350
+      })
+    });
+    if (!response.ok) return "Error al cargar las pistas. Intenta de nuevo.";
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "No se recibieron pistas.";
+  } catch (error: any) {
+    return `Error de red: ${error.message}`;
+  }
+};

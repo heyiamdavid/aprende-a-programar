@@ -5,7 +5,7 @@ import { Play, CheckCircle, Terminal, BookOpen, Sparkles, GripHorizontal, User, 
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import Split from 'react-split';
-import { getCodeReview, validateChallengeCompletion } from '../lib/groq';
+import { getCodeReview, validateChallengeCompletion, getHints } from '../lib/groq';
 import { CHALLENGES, type Challenge } from '../data/challenges';
 import ProfileModal from '../components/ProfileModal';
 
@@ -116,7 +116,9 @@ export default function EditorPage() {
   const [pyodideReady, setPyodideReady] = useState(false);
   const [consoleHeight, setConsoleHeight] = useState(200);
   const [showProfile, setShowProfile] = useState(false);
-  const [lessonTab, setLessonTab] = useState<'lesson' | 'reto'>('lesson');
+  const [lessonTab, setLessonTab] = useState<'lesson' | 'reto' | 'hints'>('lesson');
+  const [hints, setHints] = useState<string>('');
+  const [isLoadingHints, setIsLoadingHints] = useState(false);
   type LayoutMode = 'vertical' | 'horizontal' | 'horizontal-reverse';
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('horizontal');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -184,6 +186,7 @@ export default function EditorPage() {
     setCode(saved !== null ? saved : ch.initialCode);
     setOutput(`Cargado: ${ch.title}\n`);
     setLessonTab('lesson');
+    setHints(''); // Reset hints on challenge change
   };
 
   // Resizable terminal
@@ -278,22 +281,20 @@ export default function EditorPage() {
       if (success) {
         setOutput(`✅ ¡RETO COMPLETADO!\n\n${feedback}`);
         localStorage.setItem(`done_challenge_${selectedChallenge.id}`, 'true');
-        setRenderTrigger(p => p + 1); // Force re-render to update sidebar checkmark
+        setRenderTrigger(p => p + 1);
 
-        // Auto-advance
+        // Auto-advance to next challenge after 3s
         const currentIndex = routeChallenges.findIndex(c => c.id === selectedChallenge.id);
         if (currentIndex !== -1 && currentIndex < routeChallenges.length - 1) {
           const nextChallenge = routeChallenges[currentIndex + 1];
           setTimeout(() => {
-            setSelectedChallenge(nextChallenge);
-            const savedCode = localStorage.getItem(`code_challenge_${nextChallenge.id}`);
-            setCode(savedCode !== null ? savedCode : nextChallenge.initialCode);
-            setOutput(`Pasando a la siguiente lección: ${nextChallenge.title}\n`);
-          }, 3000);
+            handleSelectChallenge(nextChallenge);
+            setOutput(`🎉 ¡Excelente! Pasando a: ${nextChallenge.title}\n`);
+          }, 2500);
         } else {
           setTimeout(() => {
-            setOutput(`¡Felicidades! Has completado todos los retos de la ruta ${routeLabel}.\n`);
-          }, 2000);
+            setOutput(`🏆 ¡Felicidades! Has completado TODOS los retos de la ruta ${routeLabel}.\n`);
+          }, 1500);
         }
       } else {
         setOutput(`❌ AÚN TE FALTAN DETALLES:\n\n${feedback}\n\nCorrige tu código y vuelve a intentarlo.`);
@@ -449,6 +450,26 @@ export default function EditorPage() {
               >
                 <Target size={15} /> Tu Reto
               </button>
+              <button
+                onClick={async () => {
+                  setLessonTab('hints');
+                  if (!hints && !isLoadingHints) {
+                    setIsLoadingHints(true);
+                    const h = await getHints(selectedChallenge.title, selectedChallenge.instructions, code);
+                    setHints(h);
+                    setIsLoadingHints(false);
+                  }
+                }}
+                style={{
+                  flex: 1, padding: '10px 16px', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '0.85rem', fontWeight: 700, fontFamily: 'var(--font-sans)',
+                  borderBottom: lessonTab === 'hints' ? '3px solid #f59e0b' : '3px solid transparent',
+                  color: lessonTab === 'hints' ? '#f59e0b' : 'var(--text-secondary)',
+                  display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', transition: 'color 0.15s',
+                }}
+              >
+                <Sparkles size={15} /> Pistas 💡
+              </button>
             </div>
             <button
               onClick={() => {
@@ -470,6 +491,32 @@ export default function EditorPage() {
             {lessonTab === 'lesson' ? (
               <div className="markdown-content">
                 <ReactMarkdown>{selectedChallenge.lesson}</ReactMarkdown>
+              </div>
+            ) : lessonTab === 'hints' ? (
+              <div>
+                <div style={{ marginBottom: '14px', padding: '10px 14px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '10px', fontSize: '0.82rem', color: '#f59e0b' }}>
+                  💡 <strong>Pistas progresivas</strong> — Léelas una por una antes de pasar a la siguiente.
+                </div>
+                {isLoadingHints ? (
+                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>⏳ Generando pistas personalizadas para tu código actual...</p>
+                ) : (
+                  <div className="markdown-content">
+                    <ReactMarkdown>{hints}</ReactMarkdown>
+                  </div>
+                )}
+                <button
+                  onClick={async () => {
+                    setHints('');
+                    setIsLoadingHints(true);
+                    const h = await getHints(selectedChallenge.title, selectedChallenge.instructions, code);
+                    setHints(h);
+                    setIsLoadingHints(false);
+                  }}
+                  disabled={isLoadingHints}
+                  style={{ marginTop: '14px', padding: '8px 16px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)', borderRadius: '8px', color: '#f59e0b', cursor: 'pointer', fontSize: '0.82rem' }}
+                >
+                  🔄 Actualizar pistas (basadas en tu código actual)
+                </button>
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', flexDirection: 'column' }}>
