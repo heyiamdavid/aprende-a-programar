@@ -184,7 +184,7 @@ export default function EditorPage() {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)' }}>
       {/* Sidebar */}
-      <aside className="glass-panel" style={{ width: '300px', margin: '16px', display: 'flex', flexDirection: 'column' }}>
+      <aside className="solid-panel" style={{ width: '300px', margin: '16px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <BookOpen size={20} color="var(--accent-primary)" />
           <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Ruta de Python</h2>
@@ -200,10 +200,10 @@ export default function EditorPage() {
                 key={ch.id}
                 onClick={() => handleSelectChallenge(ch)}
                 style={{
-                  padding: '12px 14px', borderRadius: '8px', cursor: 'pointer',
-                  background: isActive ? 'var(--accent-glow)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}`,
-                  transition: 'all 0.2s',
+                  padding: '12px 14px', borderRadius: '12px', cursor: 'pointer',
+                  background: isActive ? 'var(--bg-hover)' : 'transparent',
+                  border: `2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'}`,
+                  transition: 'all 0.1s',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -247,7 +247,7 @@ export default function EditorPage() {
       {/* Main area */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: '16px 16px 16px 0', gap: '12px', minWidth: 0 }}>
         {/* Challenge instructions */}
-        <div className="glass-panel" style={{ padding: '18px 20px' }}>
+        <div className="solid-panel" style={{ padding: '20px 24px' }}>
           <h1 style={{ margin: '0 0 6px 0', fontSize: '1.3rem', color: 'var(--accent-primary)' }}>{selectedChallenge.title}</h1>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.93rem' }}>
             {selectedChallenge.description}
@@ -255,23 +255,23 @@ export default function EditorPage() {
         </div>
 
         {/* Editor */}
-        <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
+        <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>main.py</span>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={handleReviewCode}
                 disabled={isReviewing}
-                style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '7px 14px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '6px', cursor: isReviewing ? 'wait' : 'pointer', fontWeight: 600, fontSize: '0.85rem', opacity: isReviewing ? 0.7 : 1 }}
+                className="btn-chunky btn-primary"
               >
-                <Sparkles size={15} />
+                <Sparkles size={18} />
                 {isReviewing ? 'Revisando...' : 'Revisión IA'}
               </button>
               <button
                 onClick={handleRunCode}
-                style={{ background: 'var(--success)', color: '#fff', border: 'none', padding: '7px 14px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+                className="btn-chunky btn-success"
               >
-                <Play size={15} fill="white" />
+                <Play size={18} fill="white" />
                 Ejecutar
               </button>
             </div>
@@ -297,10 +297,10 @@ export default function EditorPage() {
         </div>
 
         {/* Console */}
-        <div className="glass-panel" style={{ height: `${consoleHeight}px`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.2)' }}>
-            <Terminal size={14} color="var(--text-secondary)" />
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Consola de salida</span>
+        <div className="solid-panel" style={{ height: `${consoleHeight}px`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '8px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Terminal size={16} color="var(--text-secondary)" />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Consola</span>
           </div>
           <div style={{ flex: 1, padding: '12px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.88rem', overflowY: 'auto', whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>
             {output}

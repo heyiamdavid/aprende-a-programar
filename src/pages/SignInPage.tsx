@@ -10,22 +10,22 @@ const features = [
 
 const clerkAppearance = {
   variables: {
-    colorPrimary: '#3b82f6',
-    colorBackground: '#0f172a',
-    colorText: '#f8fafc',
-    colorTextSecondary: '#94a3b8',
-    colorInputBackground: '#1e293b',
-    colorInputText: '#f8fafc',
-    borderRadius: '10px',
+    colorPrimary: '#1cb0f6',
+    colorBackground: '#1e1e1e',
+    colorText: '#ffffff',
+    colorTextSecondary: '#a0a0a0',
+    colorInputBackground: '#121212',
+    colorInputText: '#ffffff',
+    borderRadius: '12px',
   },
   elements: {
     card: {
-      background: 'rgba(30, 41, 59, 0.9)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+      background: 'var(--bg-panel)',
+      border: '2px solid var(--border-color)',
+      boxShadow: 'none',
     },
     footer: { background: 'transparent' },
-    footerAction: { color: '#94a3b8' },
+    footerAction: { color: '#a0a0a0' },
   },
 };
 
@@ -36,11 +36,11 @@ export default function SignInPage() {
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '60px', gap: '24px', minWidth: '400px',
-        background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(30,41,59,0.4) 100%)',
-        borderRight: '1px solid var(--border-color)',
+        background: 'var(--bg-panel)',
+        borderRight: '2px solid var(--border-color)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ padding: '10px', background: 'rgba(59,130,246,0.2)', borderRadius: '12px' }}>
+          <div style={{ padding: '10px', background: 'var(--bg-darker)', borderRadius: '12px', border: '2px solid var(--border-color)' }}>
             <Terminal size={28} color="var(--accent-primary)" />
           </div>
           <span style={{ fontSize: '1.3rem', fontWeight: 700 }}>Aprende a Programar</span>

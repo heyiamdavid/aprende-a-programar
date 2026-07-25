@@ -1,16 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
 
 :root {
-  --bg-dark: #0f172a;
-  --bg-darker: #020617;
-  --bg-panel: rgba(30, 41, 59, 0.7);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-primary: #3b82f6;
-  --accent-glow: rgba(59, 130, 246, 0.5);
-  --success: #22c55e;
-  --error: #ef4444;
-  --border-color: rgba(255, 255, 255, 0.1);
+  /* VS Code Dark Style Base */
+  --bg-darker: #121212;
+  --bg-panel: #1e1e1e;
+  --bg-hover: #2d2d2d;
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  
+  /* Gamified Accents (Duolingo Style) */
+  --accent-primary: #1cb0f6;
+  --accent-primary-hover: #1899d6;
+  --accent-primary-shadow: #1480b3;
+  
+  --success: #58cc02;
+  --success-hover: #46a302;
+  --success-shadow: #3b8a02;
+  
+  --border-color: #2d2d2d;
+  --border-light: #3d3d3d;
+  
+  /* Fonts */
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'Fira Code', monospace;
 }
@@ -26,35 +38,87 @@ body {
   background-color: var(--bg-darker);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow: hidden; /* Prevent scrolling on the whole page, panels will scroll */
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glassmorphism Utilities */
-.glass-panel {
+/* Solid Panels replacing Glassmorphism */
+.solid-panel {
   background: var(--bg-panel);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+}
+
+/* Chunky Buttons */
+.btn-chunky {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
   border-radius: 12px;
+  padding: 10px 20px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-chunky:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translateY(4px) !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background-color: var(--accent-primary);
+  box-shadow: 0 4px 0 var(--accent-primary-shadow);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-primary-hover);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 var(--accent-primary-shadow);
+}
+
+.btn-success {
+  background-color: var(--success);
+  box-shadow: 0 4px 0 var(--success-shadow);
+}
+.btn-success:hover:not(:disabled) {
+  background-color: var(--success-hover);
+}
+.btn-success:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 var(--success-shadow);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2); 
+  background: var(--bg-darker);
+  border-radius: 10px;
 }
  
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1); 
-  border-radius: 4px;
+  background: var(--border-color);
+  border-radius: 10px;
+  border: 2px solid var(--bg-darker);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2); 
+  background: var(--border-light); 
 }

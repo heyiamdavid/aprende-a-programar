@@ -30,7 +30,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="glass-panel"
+        className="solid-panel"
         style={{
           width: '520px', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
           overflow: 'hidden', position: 'relative',
@@ -38,9 +38,9 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
       >
         {/* Header */}
         <div style={{
-          padding: '24px', borderBottom: '1px solid var(--border-color)',
+          padding: '24px', borderBottom: '2px solid var(--border-color)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'rgba(0,0,0,0.2)',
+          background: 'var(--bg-darker)',
         }}>
           <h2 style={{ margin: 0, fontSize: '1.3rem' }}>Mi Perfil</h2>
           <button
@@ -53,7 +53,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
 
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {/* User info */}
-          <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid var(--border-color)' }}>
+          <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '2px solid var(--border-color)' }}>
             {user?.imageUrl ? (
               <img
                 src={user.imageUrl}
@@ -79,34 +79,34 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
           </div>
 
           {/* Stats */}
-          <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', borderBottom: '1px solid var(--border-color)' }}>
-            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(34,197,94,0.1)', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.2)' }}>
+          <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', borderBottom: '2px solid var(--border-color)' }}>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-darker)', borderRadius: '12px', border: '2px solid var(--border-color)' }}>
               <div style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--success)' }}>{completedCount}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Completados</div>
             </div>
-            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(59,130,246,0.1)', borderRadius: '10px', border: '1px solid rgba(59,130,246,0.2)' }}>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-darker)', borderRadius: '12px', border: '2px solid var(--border-color)' }}>
               <div style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-primary)' }}>{startedCount}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>En progreso</div>
             </div>
-            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-darker)', borderRadius: '12px', border: '2px solid var(--border-color)' }}>
               <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{CHALLENGES.length}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Total retos</div>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-color)' }}>
+          <div style={{ padding: '16px 24px', borderBottom: '2px solid var(--border-color)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Progreso general</span>
               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
                 {Math.round((completedCount / CHALLENGES.length) * 100)}%
               </span>
             </div>
-            <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ height: '12px', background: 'var(--bg-darker)', borderRadius: '6px', overflow: 'hidden', border: '2px solid var(--border-color)' }}>
               <div style={{
                 height: '100%',
                 width: `${(completedCount / CHALLENGES.length) * 100}%`,
-                background: 'linear-gradient(90deg, var(--accent-primary), var(--success))',
+                background: 'var(--success)',
                 borderRadius: '4px',
                 transition: 'width 0.5s ease',
               }} />
@@ -123,9 +123,9 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
                 key={ch.id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '12px', borderRadius: '8px',
-                  background: ch.isDone ? 'rgba(34,197,94,0.08)' : ch.isStarted ? 'rgba(59,130,246,0.06)' : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${ch.isDone ? 'rgba(34,197,94,0.2)' : ch.isStarted ? 'rgba(59,130,246,0.15)' : 'var(--border-color)'}`,
+                  padding: '12px', borderRadius: '12px',
+                  background: ch.isDone ? 'var(--bg-darker)' : ch.isStarted ? 'var(--bg-darker)' : 'transparent',
+                  border: `2px solid ${ch.isDone ? 'var(--success)' : ch.isStarted ? 'var(--accent-primary)' : 'var(--border-color)'}`,
                 }}
               >
                 {ch.isDone ? (
@@ -143,7 +143,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
                   <Trophy size={14} color="var(--success)" />
                 )}
                 {ch.isStarted && !ch.isDone && (
-                  <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', background: 'rgba(59,130,246,0.1)', padding: '2px 8px', borderRadius: '20px' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-primary)', background: 'var(--accent-primary)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>
                     En progreso
                   </span>
                 )}
