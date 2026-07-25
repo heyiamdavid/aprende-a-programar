@@ -76,9 +76,13 @@ self.onmessage = async function (e) {
     var code = msg.code;
     var sharedBuffer = msg.sharedBuffer;
 
-    // Update global SAB views for this execution run
-    globalControlArray = new Int32Array(sharedBuffer, 0, 2);
-    globalTextArray = new Uint8Array(sharedBuffer, 8);
+    if (sharedBuffer) {
+      globalControlArray = new Int32Array(sharedBuffer, 0, 2);
+      globalTextArray = new Uint8Array(sharedBuffer, 8);
+    } else {
+      globalControlArray = null;
+      globalTextArray = null;
+    }
 
     // Redirect stdout and stderr to the main thread
     pyodide.setStdout({

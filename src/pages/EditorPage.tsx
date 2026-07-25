@@ -156,18 +156,11 @@ export default function EditorPage() {
 
     setOutput('Cargando entorno Python (Pyodide)...\n');
 
-    let sab: SharedArrayBuffer;
+    let sab: SharedArrayBuffer | null = null;
     try {
-      // SharedArrayBuffer requires COOP/COEP headers to be enabled.
-      // If the server was recently configured, a restart is needed.
       sab = new SharedArrayBuffer(4096);
     } catch {
-      setOutput(
-        '[Error] SharedArrayBuffer no disponible.\n' +
-        'Reinicia el servidor de desarrollo con: npm run dev\n' +
-        'Las nuevas cabeceras de seguridad necesitan un reinicio para activarse.\n'
-      );
-      return;
+      console.warn('SharedArrayBuffer no disponible en este navegador o servidor.');
     }
     sharedBufferRef.current = sab;
 
@@ -326,7 +319,7 @@ export default function EditorPage() {
       return;
     }
 
-    if (!pyodideReady || !workerRef.current || !sharedBufferRef.current) return;
+    if (!pyodideReady || !workerRef.current) return;
 
     // Send code to the worker to execute
     workerRef.current.postMessage({
