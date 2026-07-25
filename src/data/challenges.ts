@@ -1875,6 +1875,134 @@ El sistema deberá desarrollarse bajo POO y aplicar el patrón de diseño **Fact
    - Selector (Radiobuttons o Combobox) para tipo de servicio.
    - Botón "Registrar pedido" que usa la Fábrica y actualiza una Lista (Listbox/Treeview) mostrando el total a pagar.`,
     initialCode: 'import tkinter as tk\nfrom tkinter import ttk, messagebox\nfrom abc import ABC, abstractmethod\n\n# ==========================================\n# 1. LÓGICA DE NEGOCIO (MODELO)\n# ==========================================\n\n# TODO: Implementar clase abstracta Servicio y clases hijas (SOLID: SRP, OCP)\n\n\n# TODO: Implementar ServicioFactory (Patrón Factory Method)\n\n\n# TODO: Implementar clase Pedido\n\n\n# ==========================================\n# 2. INTERFAZ GRÁFICA (VISTA / CONTROLADOR)\n# ==========================================\n\nclass AppPedidos:\n    def __init__(self, root):\n        self.root = root\n        self.root.title("Sistema de Cafetería")\n        # TODO: Construir la interfaz (Labels, Entries, Combobox, Button, Listbox)\n        \n    def registrar_pedido(self):\n        pass\n        # TODO: Leer datos de la interfaz\n        # TODO: Usar ServicioFactory para crear el servicio\n        # TODO: Mostrar en la interfaz y confirmar\n\n# Bloque principal\nif __name__ == "__main__":\n    # root = tk.Tk()\n    # app = AppPedidos(root)\n    # root.mainloop()\n    print("Recuerda: Tkinter no se ejecutará en la web. ¡Dale a \\\'Completar\\\' para que la IA evalúe tu código!")\n'
+  },
+  // ─────────────────────────────────────────────
+  // MÓDULO 11: Principios SOLID y Patrones
+  // ─────────────────────────────────────────────
+  {
+    id: 40,
+    title: "40. Principio Abierto/Cerrado (OCP)",
+    category: "SOLID y Patrones",
+    lesson: `## Principio Abierto/Cerrado (OCP)
+
+El **OCP** (Open/Closed Principle) es el segundo principio SOLID. Dice que una clase debe estar **abierta para su extensión, pero cerrada para su modificación**.
+En lugar de modificar código existente al agregar nuevas funcionalidades, deberías poder agregar código nuevo (por ejemplo, mediante herencia o polimorfismo).
+
+❌ **Mal diseño** (hay que modificar la clase para agregar formas):
+\`\`\`python
+class CalculadoraAreas:
+    def calcular(self, figura):
+        if figura.tipo == "cuadrado":
+            return figura.lado * figura.lado
+        elif figura.tipo == "circulo":
+            return 3.14 * figura.radio ** 2
+\`\`\`
+
+✅ **Buen diseño** (usando polimorfismo):
+\`\`\`python
+class Figura:
+    def area(self): pass
+
+class Cuadrado(Figura):
+    def __init__(self, lado): self.lado = lado
+    def area(self): return self.lado * self.lado
+
+class CalculadoraAreas:
+    def calcular(self, figura: Figura):
+        return figura.area()
+\`\`\`
+
+> 💡 Si agregas un Triángulo, ¡no necesitas tocar \`CalculadoraAreas\`!`,
+    instructions: `**Tu reto:** Tienes una clase \`ProcesadorPagos\` que procesa pagos con if/else (Tarjeta o PayPal). Refactoriza el código aplicando OCP. Crea una clase base abstracta \`MetodoPago\` con el método \`procesar_pago(monto)\`, y clases hijas \`PagoTarjeta\` y \`PagoPayPal\` que implementen ese método. Luego actualiza \`ProcesadorPagos\` para que simplemente reciba un \`MetodoPago\` y llame a su método \`procesar_pago\`.`,
+    initialCode: '# Código inicial a refactorizar:\nclass ProcesadorPagos:\n    def procesar(self, tipo, monto):\n        if tipo == "tarjeta":\n            print(f"Procesando ${monto} con Tarjeta.")\n        elif tipo == "paypal":\n            print(f"Procesando ${monto} con PayPal.")\n\np = ProcesadorPagos()\np.procesar("tarjeta", 100)\n\n# TODO: Refactoriza aplicando OCP con polimorfismo\n'
+  },
+  {
+    id: 41,
+    title: "41. Inversión de Dependencias (DIP)",
+    category: "SOLID y Patrones",
+    lesson: `## Principio de Inversión de Dependencias (DIP)
+
+El **DIP** (Dependency Inversion Principle) es la 'D' de SOLID. Sugiere que los módulos de alto nivel no deben depender de módulos de bajo nivel. Ambos deben depender de **abstracciones**.
+Además, las abstracciones no deben depender de los detalles.
+
+❌ **Mal diseño**:
+\`\`\`python
+class BaseDeDatosMySQL:
+    def guardar(self, dato):
+        print("Guardando en MySQL")
+
+class GestorUsuarios: # Depende directamente de la implementación MySQL
+    def __init__(self):
+        self.bd = BaseDeDatosMySQL()
+\`\`\`
+
+✅ **Buen diseño**:
+\`\`\`python
+from abc import ABC, abstractmethod
+
+class InterfazBaseDeDatos(ABC):
+    @abstractmethod
+    def guardar(self, dato): pass
+
+class BaseDeDatosMySQL(InterfazBaseDeDatos):
+    def guardar(self, dato):
+        print("Guardando en MySQL")
+
+class GestorUsuarios:
+    # Depende de la abstracción, se le inyecta la dependencia
+    def __init__(self, bd: InterfazBaseDeDatos):
+        self.bd = bd
+\`\`\``,
+    instructions: `**Tu reto:** Tienes una clase \`EnvioSistema\` que depende directamente de \`ServicioEmail\`. Refactorízalo: Crea una interfaz/clase abstracta \`ServicioMensajeria\` con el método \`enviar(mensaje)\`. Haz que \`ServicioEmail\` y un nuevo \`ServicioSMS\` hereden de ella. Modifica \`EnvioSistema\` para que reciba cualquier \`ServicioMensajeria\` por su constructor (Inyección de Dependencias).`,
+    initialCode: 'class ServicioEmail:\n    def enviar(self, mensaje):\n        print(f"Enviando Email: {mensaje}")\n\nclass EnvioSistema:\n    def __init__(self):\n        self.servicio = ServicioEmail() # Fuerte acoplamiento\n    def notificar(self, msj):\n        self.servicio.enviar(msj)\n\n# TODO: Refactoriza usando DIP e inyección de dependencias\n'
+  },
+  {
+    id: 42,
+    title: "42. Patrón Observer",
+    category: "SOLID y Patrones",
+    lesson: `## Patrón de Diseño: Observer
+
+El **Observer** es un patrón de comportamiento. Permite definir un mecanismo de suscripción para notificar a varios objetos (observadores) sobre cualquier evento que le suceda al objeto que están observando (sujeto).
+
+**Partes principales:**
+1. **Sujeto (Subject):** Mantiene la lista de observadores y los notifica.
+2. **Observadores (Observers):** Los objetos que quieren ser notificados.
+
+\`\`\`python
+class Sujeto:
+    def __init__(self):
+        self.observadores = []
+    def suscribir(self, obs):
+        self.observadores.append(obs)
+    def notificar(self, mensaje):
+        for obs in self.observadores:
+            obs.actualizar(mensaje)
+
+class Observador:
+    def actualizar(self, mensaje):
+        print(f"Notificado: {mensaje}")
+\`\`\``,
+    instructions: `**Tu reto:** Implementa el patrón Observer. Crea una clase \`CanalYouTube\` (Sujeto) que tenga una lista de suscriptores y los métodos \`suscribir(usuario)\` y \`subir_video(titulo)\` (este último debe notificar a todos). Luego crea una clase \`Suscriptor\` (Observador) con un método \`notificar(video_titulo)\` que imprima \`"Nuevo video disponible: [titulo]"\`.`,
+    initialCode: '# TODO: Implementa CanalYouTube (Sujeto)\n\n\n# TODO: Implementa Suscriptor (Observador)\n\n\n# TODO: Crea el canal, añade dos suscriptores y sube un video\n'
+  },
+  {
+    id: 43,
+    title: "43. Proyecto: E-Commerce (SOLID + Patrones)",
+    category: "Proyectos POO",
+    type: "project",
+    lesson: `## Combinando SOLID y Patrones
+
+En sistemas reales, no aplicas un solo principio, ¡los combinas todos!
+Imagina un sistema de E-Commerce:
+- **SRP (Single Responsibility):** Una clase para Carrito, otra para Procesar Pagos, otra para Notificar.
+- **OCP (Open/Closed) & Strategy Pattern:** Puedes agregar métodos de pago (Tarjeta, Cripto, PayPal) sin tocar la lógica principal de checkout.
+- **Observer Pattern:** Al completar la compra, notificas al cliente por Email y al departamento de inventario, sin que la clase de Pago sepa cómo funcionan los emails o el inventario.`,
+    instructions: `**Tu reto:** Crea un mini sistema de compras.
+1. Crea una clase \`Carrito\` (SRP) que guarde items y calcule el total.
+2. Usa el patrón **Strategy** (similar a OCP) definiendo una interfaz \`EstrategiaPago\` y creando \`PagoTarjeta\` y \`PagoCripto\`.
+3. Usa el patrón **Observer** para que, cuando el \`Carrito\` ejecute \`checkout(metodo_pago)\`, notifique a los observadores suscritos (ej. \`NotificadorEmail\`).
+4. ¡Prueba todo junto! Añade productos, suscribe el notificador, y haz el checkout con cripto.`,
+    initialCode: 'from abc import ABC, abstractmethod\n\n# TODO: 1. Patrón Strategy para Pagos (EstrategiaPago, PagoTarjeta, PagoCripto)\n\n# TODO: 2. Patrón Observer para Notificaciones (Observador, NotificadorEmail)\n\n# TODO: 3. Clase Carrito que actúe como Sujeto (maneje observers) y use la Estrategia de Pago en el checkout\n\n# TODO: 4. Script de prueba\n'
   }
 ];
 

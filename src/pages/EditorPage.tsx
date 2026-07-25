@@ -263,15 +263,10 @@ export default function EditorPage() {
     isDraggingRef.current = true;
     startYRef.current = clientY;
     startHeightRef.current = consoleHeight;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchUp);
   };
   
   const handleMouseDown = (e: React.MouseEvent) => handleStartDrag(e.clientY);
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Only handle single touch
     if (e.touches.length === 1) {
       handleStartDrag(e.touches[0].clientY);
     }
@@ -283,26 +278,31 @@ export default function EditorPage() {
     setConsoleHeight(Math.max(100, Math.min(500, startHeightRef.current + delta)));
   }, []);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => handleDragMove(e.clientY), [handleDragMove]);
-  
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (isDraggingRef.current) {
-      e.preventDefault(); // Prevent scrolling while dragging
-      handleDragMove(e.touches[0].clientY);
-    }
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (isDraggingRef.current) {
+        e.preventDefault();
+        handleDragMove(e.touches[0].clientY);
+      }
+    };
+    const onMouseUp = () => { isDraggingRef.current = false; };
+    const onTouchEnd = () => { isDraggingRef.current = false; };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+    };
   }, [handleDragMove]);
-
-  const handleMouseUp = useCallback(() => {
-    isDraggingRef.current = false;
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove]);
-
-  const handleTouchUp = useCallback(() => {
-    isDraggingRef.current = false;
-    document.removeEventListener('touchmove', handleTouchMove);
-    document.removeEventListener('touchend', handleTouchUp);
-  }, [handleTouchMove]);
 
   // Run code
   const handleRunCode = async () => {
@@ -501,7 +501,7 @@ export default function EditorPage() {
   );
 
   const instructionsPanelJSX = (
-    <div style={{ overflow: 'hidden', paddingBottom: isMobile ? '0' : '4px', display: isMobile && mobileTab !== 'instructions' ? 'none' : 'block', flex: isMobile ? 1 : undefined }}>
+    <div style={{ overflow: 'hidden', paddingBottom: isMobile ? '0' : '4px', display: isMobile && mobileTab !== 'instructions' ? 'none' : 'block', flex: isMobile ? 1 : undefined, height: isMobile ? undefined : '100%' }}>
       <div className="solid-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', borderTopLeftRadius: isMobile ? 0 : '16px', borderTopRightRadius: isMobile ? 0 : '16px' }}>
           {/* Tab header */}
           <div style={{ display: 'flex', borderBottom: '2px solid var(--border-color)', alignItems: 'center', overflowX: 'auto', flexShrink: 0 }}>
@@ -619,7 +619,7 @@ export default function EditorPage() {
   );
 
   const editorPanelJSX = (
-    <div style={{ overflow: 'hidden', paddingTop: isMobile ? '10px' : '4px', display: isMobile && mobileTab !== 'editor' ? 'none' : 'flex', flexDirection: 'column', flex: isMobile ? 1 : undefined }}>
+    <div style={{ overflow: 'hidden', paddingTop: isMobile ? '10px' : '4px', display: isMobile && mobileTab !== 'editor' ? 'none' : 'flex', flexDirection: 'column', flex: isMobile ? 1 : undefined, height: isMobile ? undefined : '100%' }}>
       <div className="solid-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflowX: 'auto', flexShrink: 0 }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{ruta === 'javascript' ? 'main.js' : 'main.py'}</span>
@@ -720,7 +720,7 @@ export default function EditorPage() {
   );
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-darker)', overflow: 'hidden' }}>
       {isSidebarOpen ? (
         <Split 
           sizes={isMobile ? [100, 0] : [22, 78]} 
