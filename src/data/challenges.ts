@@ -929,12 +929,149 @@ with open("datos.txt", "r") as archivo:
     instructions: `**Tu reto:** Simula un registro de estudiantes. 1) Crea una lista con 5 nombres de estudiantes. 2) Escríbelos en un archivo llamado \`"estudiantes.txt"\`, uno por línea. 3) Lee el archivo y muestra cada nombre numerado (ej: "1. Ana"). 4) Muestra cuántos estudiantes hay en total.`,
     initialCode: '# TODO: Resuelve el reto aquí\n'
   },
-
-  // ─────────────────────────────────────────────
-  // MÓDULO 13: Proyectos POO
-  // ─────────────────────────────────────────────
   {
     id: 25,
+    title: "25. Ficheros JSON y Persistencia",
+    category: "Ficheros",
+    lesson: `## Ficheros JSON en Python
+
+El formato **JSON** (JavaScript Object Notation) es el estándar más utilizado en desarrollo web y APIs para guardar y transmitir datos estructurados.
+
+En Python usamos el módulo integrado \`json\`:
+
+### Guardar datos en JSON (\`json.dump\`)
+\`\`\`python
+import json
+
+usuario = {
+    "nombre": "Elena",
+    "edad": 28,
+    "habilidades": ["Python", "SQL", "Git"]
+}
+
+# Guardar en archivo .json con formato legible (indent=4)
+with open("usuario.json", "w", encoding="utf-8") as archivo:
+    json.dump(usuario, archivo, indent=4)
+\`\`\`
+
+### Leer datos desde JSON (\`json.load\`)
+\`\`\`python
+import json
+
+with open("usuario.json", "r", encoding="utf-8") as archivo:
+    datos = json.load(archivo)
+    print(datos["nombre"])       # "Elena"
+    print(datos["habilidades"])  # ["Python", "SQL", "Git"]
+\`\`\`
+
+> 💡 \`json.dump\` escribe en un archivo, mientras que \`json.load\` lee desde un archivo y lo convierte a objeto Python (diccionario o lista).`,
+    instructions: `**Tu reto:** 
+1. Crea un diccionario con un catálogo de 3 productos (cada producto con \`"nombre"\` y \`"precio"\`).
+2. Guárdalo en un archivo llamado \`"catalogo.json"\` usando \`json.dump()\`.
+3. Lee el archivo \`"catalogo.json"\`, recorre los productos e imprime el nombre y precio de cada uno.`,
+    initialCode: '# TODO: Resuelve el reto de ficheros JSON aquí\n'
+  },
+
+  // ─────────────────────────────────────────────
+  // MÓDULO 13: Pasarelas de Pago e Integraciones
+  // ─────────────────────────────────────────────
+  {
+    id: 26,
+    title: "26. Pasarela de Pagos (Encapsulamiento)",
+    category: "Pasarelas de Pago",
+    lesson: `## Encapsulamiento en Pasarelas de Pago
+
+En las aplicaciones del mundo real (como e-commerce o SaaS), la lógica de cobro y las credenciales secretas (API Keys) deben estar estrictamente **encapsuladas** para evitar fraude y fuga de datos.
+
+### Simulación de Pasarela con Atributos Privados
+\`\`\`python
+class StripeGateway:
+    def __init__(self, api_key: str):
+        self.__api_key = api_key        # Clave privada
+        self.__comision_porcentaje = 3.5 # Comisión interna protegida
+
+    def __validar_tarjeta(self, numero_tarjeta: str) -> bool:
+        # Método privado: valida que tenga 16 dígitos
+        return len(numero_tarjeta) == 16 and numero_tarjeta.isdigit()
+
+    def procesar_pago(self, monto: float, numero_tarjeta: str) -> dict:
+        if not self.__validar_tarjeta(numero_tarjeta):
+            return {"exito": False, "mensaje": "Tarjeta inválida"}
+
+        comision = (monto * self.__comision_porcentaje) / 100
+        total = monto + comision
+
+        return {
+            "exito": True,
+            "monto_neto": monto,
+            "comision": round(comision, 2),
+            "total_cobrado": round(total, 2),
+            "id_transaccion": "tx_stripe_9921"
+        }
+\`\`\`
+
+> 🔒 El usuario del código solo llama a \`procesar_pago()\`. La clave secreta y el cálculo de la comisión quedan totalmente aislados.`,
+    instructions: `**Tu reto:** 
+1. Crea una clase \`PayPalGateway\` con una clave secreta privada \`__client_secret\` enviada en el constructor.
+2. Agrega un método privado \`__verificar_cuenta(email)\` que retorne \`True\` si el email contiene \`"@"\`.
+3. Implementa \`cobrar(email, monto)\`: si el email es válido, calcula una comisión del 4% y retorna un diccionario con \`"status": "APPROVED"\`, el \`monto\` y la \`comision\`. Si no, retorna \`"status": "REJECTED"\`.`,
+    initialCode: '# TODO: Implementa tu pasarela PayPal aquí\n'
+  },
+  {
+    id: 27,
+    title: "27. Sistema Multipasarela (Polimorfismo & Adapter)",
+    category: "Pasarelas de Pago",
+    lesson: `## Sistema Multipasarela con Polimorfismo
+
+Cuando tu aplicación necesita aceptar **múltiples formas de pago** (Stripe, PayPal, MercadoPago), en lugar de escribir un código lleno de \`if/else\`, usas **Polimorfismo y Clases Abstractas**.
+
+Así, el sistema principal interactúa con cualquier pasarela sin importar cómo funcione por dentro.
+
+\`\`\`python
+from abc import ABC, abstractmethod
+
+# 1. Interfaz unificada para todas las pasarelas
+class PasarelaPago(ABC):
+    @abstractmethod
+    def pagar(self, monto: float) -> bool:
+        pass
+
+# 2. Implementación para Stripe
+class StripeService(PasarelaPago):
+    def pagar(self, monto: float) -> bool:
+        print(f"💳 [Stripe] Cobrando \${monto} USD con tarjeta de crédito...")
+        return True
+
+# 3. Implementación para MercadoPago
+class MercadoPagoService(PasarelaPago):
+    def pagar(self, monto: float) -> bool:
+        print(f"📱 [MercadoPago] Cobrando \${monto} USD con código QR...")
+        return True
+
+# 4. Procesador universal (Desacoplado)
+class ProcesadorVentas:
+    def __init__(self, pasarela: PasarelaPago):
+        self.pasarela = pasarela  # Acepta cualquier pasarela que cumpla la interfaz
+
+    def realizar_compra(self, monto: float):
+        exito = self.pasarela.pagar(monto)
+        if exito:
+            print("✅ Compra completada con éxito.")
+\`\`\`
+
+> 💡 Si mañana agregas PayPal o Apple Pay, solo creas una nueva clase sin modificar \`ProcesadorVentas\`. Esto cumple el principio **Open/Closed** de SOLID.`,
+    instructions: `**Tu reto:** 
+1. Crea la clase abstracta \`PasarelaPago\` con el método abstracto \`pagar(monto)\`.
+2. Crea dos clases que hereden de ella: \`StripeAdapter\` y \`PayPalAdapter\`, cada una imprimiendo su propio mensaje personalizado.
+3. Crea un \`ProcesadorVentas\` que reciba una pasarela e implemente un método \`finalizar_orden(monto)\`. Prueba ejecutar una orden con ambas pasarelas.`,
+    initialCode: '# TODO: Implementa el sistema multipasarela aquí\n'
+  },
+
+  // ─────────────────────────────────────────────
+  // MÓDULO 14: Proyectos POO
+  // ─────────────────────────────────────────────
+  {
+    id: 29,
     type: 'project',
     title: "🏛️ Proyecto: Sistema de Biblioteca",
     category: "Proyectos POO",

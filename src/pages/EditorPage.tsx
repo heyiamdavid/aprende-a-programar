@@ -49,17 +49,18 @@ export default function EditorPage() {
 
   // Filter challenges by route
   const routeChallenges = (() => {
+    let list: Challenge[] = [];
     if (ruta === 'poo-proyectos') {
-      return CHALLENGES.filter(c => c.category === 'Proyectos POO');
+      list = CHALLENGES.filter(c => c.category === 'Proyectos POO');
+    } else if (ruta === 'algoritmos') {
+      list = CHALLENGES.filter(c => c.id >= 30 || c.category === 'Programación Estructurada');
+    } else if (ruta === 'javascript') {
+      list = CHALLENGES.filter(c => c.category.includes('JavaScript'));
+    } else {
+      // Default: python route
+      list = CHALLENGES.filter(c => c.id < 30 && c.category !== 'Proyectos POO' && !c.category.includes('JavaScript'));
     }
-    if (ruta === 'algoritmos') {
-      return CHALLENGES.filter(c => c.category === 'Programación Estructurada' || c.category === 'Estructuras de Datos');
-    }
-    if (ruta === 'javascript') {
-      return CHALLENGES.filter(c => c.category.includes('JavaScript'));
-    }
-    // Default: python route
-    return CHALLENGES.filter(c => c.category !== 'Proyectos POO' && c.category !== 'Programación Estructurada' && c.category !== 'Estructuras de Datos' && !c.category.includes('JavaScript'));
+    return list.sort((a, b) => a.id - b.id);
   })();
 
   // Sidebar label by route
