@@ -684,6 +684,32 @@ export default function EditorPage() {
           </div>
           <div style={{ flex: 1, padding: '12px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.88rem', overflowY: 'auto', whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>
             {output}
+            {showInputModal && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{inputPrompt}</span>
+                <input
+                  autoFocus
+                  type="text"
+                  value={inputValue}
+                  onChange={e => setInputValue(e.target.value)}
+                  onKeyDown={e => { 
+                    if (e.key === 'Enter') {
+                      setOutput(prev => prev + inputPrompt + inputValue + '\n');
+                      handleInputSubmit(inputValue);
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: 'var(--success)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.88rem'
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -740,110 +766,6 @@ export default function EditorPage() {
 
       {/* Profile Modal */}
       {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
-
-      {/* Custom Python input() Modal */}
-      {showInputModal && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 9999,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(6px)',
-            animation: 'fadeIn 0.2s ease',
-          }}
-        >
-          <div
-            style={{
-              background: 'var(--bg-panel)',
-              border: '2px solid var(--border-color)',
-              borderRadius: '24px',
-              padding: '32px',
-              width: 'min(90vw, 460px)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px',
-              animation: 'slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            }}
-          >
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-              <div style={{
-                width: '40px', height: '40px',
-                background: 'rgba(28,176,246,0.15)',
-                borderRadius: '12px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-                marginTop: '2px',
-              }}>
-                <Terminal size={20} color="var(--accent-primary)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-                  Python — input()
-                </p>
-                <p style={{ margin: '4px 0 0', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', lineHeight: 1.4 }}>
-                  {inputPrompt || 'Tu programa necesita un valor'}
-                </p>
-              </div>
-            </div>
-
-            {/* Input field */}
-            <input
-              autoFocus
-              type="text"
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleInputSubmit(inputValue); }}
-              placeholder={inputPrompt ? `Escribe tu respuesta y presiona Enter…` : 'Escribe aquí y presiona Enter…'}
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '2px solid rgba(28,176,246,0.35)',
-                borderRadius: '14px',
-                padding: '14px 18px',
-                fontSize: '1rem',
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                width: '100%',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
-              }}
-            />
-
-            {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => handleInputSubmit('')}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: '14px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '2px solid var(--border-color)',
-                  color: 'var(--text-secondary)',
-                  fontWeight: 600, cursor: 'pointer',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.95rem',
-                  transition: 'all 0.2s',
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => handleInputSubmit(inputValue)}
-                className="btn-chunky btn-primary"
-                style={{
-                  flex: 2, padding: '12px', borderRadius: '14px',
-                  fontSize: '1rem', fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                }}
-              >
-                <Play size={16} fill="white" />
-                Enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
