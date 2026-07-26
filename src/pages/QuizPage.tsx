@@ -74,12 +74,11 @@ export default function QuizPage() {
     if (screen !== 'quiz' || answered) return;
     if (timeLeft <= 0) {
       setAnswered(true);
-      setTimeout(advanceQuestion, 1200);
       return;
     }
     const t = setTimeout(() => setTimeLeft(tl => tl - 1), 1000);
     return () => clearTimeout(t);
-  }, [screen, answered, timeLeft, advanceQuestion]);
+  }, [screen, answered, timeLeft]);
 
   const startQuiz = () => {
     const pool = QUIZ_QUESTIONS.filter(q => selectedCategories.includes(q.category));
@@ -105,7 +104,6 @@ export default function QuizPage() {
       next[current] = idx;
       return next;
     });
-    setTimeout(advanceQuestion, 1400);
   };
 
   const toggleCategory = (cat: string) => {
@@ -308,12 +306,23 @@ export default function QuizPage() {
 
             {/* Explanation after answer */}
             {answered && (
-              <div style={{ background: 'rgba(255,255,255,0.04)', border: '2px solid var(--border-color)', borderRadius: '12px', padding: '14px 16px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', border: '2px solid var(--border-color)', borderRadius: '12px', padding: '14px 16px', marginBottom: '20px' }}>
                 <p style={{ margin: '0 0 4px 0', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💡 Explicación</p>
                 <div className="markdown-content" style={{ fontSize: '0.88rem' }}>
                   <ReactMarkdown>{q.explanation}</ReactMarkdown>
                 </div>
               </div>
+            )}
+
+            {/* Next Button */}
+            {answered && (
+              <button
+                onClick={advanceQuestion}
+                className="btn-chunky btn-primary"
+                style={{ width: '100%', padding: '14px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                Siguiente Pregunta <ChevronRight size={20} />
+              </button>
             )}
           </div>
         </div>

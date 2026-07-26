@@ -2003,6 +2003,27 @@ Imagina un sistema de E-Commerce:
 3. Usa el patrón **Observer** para que, cuando el \`Carrito\` ejecute \`checkout(metodo_pago)\`, notifique a los observadores suscritos (ej. \`NotificadorEmail\`).
 4. ¡Prueba todo junto! Añade productos, suscribe el notificador, y haz el checkout con cripto.`,
     initialCode: 'from abc import ABC, abstractmethod\n\n# TODO: 1. Patrón Strategy para Pagos (EstrategiaPago, PagoTarjeta, PagoCripto)\n\n# TODO: 2. Patrón Observer para Notificaciones (Observador, NotificadorEmail)\n\n# TODO: 3. Clase Carrito que actúe como Sujeto (maneje observers) y use la Estrategia de Pago en el checkout\n\n# TODO: 4. Script de prueba\n'
+  },
+  {
+    id: 44,
+    title: "44. Evaluación: Factory Method + Observer",
+    category: "Proyectos POO",
+    type: "project",
+    lesson: `## Preparación para Evaluación
+    
+En este reto integrarás dos patrones poderosos de creación y comportamiento: **Factory Method** y **Observer**.
+
+Imagina un sistema de domótica (Smart Home):
+- **Factory Method**: Crearás diferentes tipos de sensores (\`SensorTemperatura\`, \`SensorMovimiento\`).
+- **Observer**: Los sensores notificarán a una central (o dispositivos como \`Alarma\` y \`Pantalla\`) cada vez que detecten un cambio o evento.
+
+Esto demuestra que los patrones no viven aislados; una fábrica puede crear sujetos (sensores) y los observadores reaccionan a ellos.`,
+    instructions: `**Tu reto:** 
+1. Crea una fábrica \`SensorFactory\` con un método \`crear_sensor(tipo)\` que retorne objetos \`SensorTemperatura\` o \`SensorMovimiento\`.
+2. Haz que los sensores hereden de una clase base \`Sujeto\` (o similar) que permita añadir observadores y notificarles (patrón **Observer**).
+3. Crea al menos un \`Observador\` (por ejemplo, \`PantallaMonitoreo\`) que reciba e imprima las notificaciones de los sensores.
+4. Usa la fábrica para crear un sensor de cada tipo, añade el observador a ambos, y simula un evento (ej. \`sensor.detectar()\`).`,
+    initialCode: 'from abc import ABC, abstractmethod\n\n# TODO: 1. Patrón Observer (Clase Base Sujeto y Clase Observador)\n\n# TODO: 2. Clases de Sensores (Sujetos concretos: SensorTemperatura, SensorMovimiento)\n\n# TODO: 3. Patrón Factory Method (SensorFactory)\n\n# TODO: 4. Script de prueba: Crear sensores, suscribir observador y lanzar eventos\n'
   }
 ];
 
