@@ -2024,6 +2024,35 @@ Esto demuestra que los patrones no viven aislados; una fábrica puede crear suje
 3. Crea al menos un \`Observador\` (por ejemplo, \`PantallaMonitoreo\`) que reciba e imprima las notificaciones de los sensores.
 4. Usa la fábrica para crear un sensor de cada tipo, añade el observador a ambos, y simula un evento (ej. \`sensor.detectar()\`).`,
     initialCode: 'from abc import ABC, abstractmethod\n\n# TODO: 1. Patrón Observer (Clase Base Sujeto y Clase Observador)\n\n# TODO: 2. Clases de Sensores (Sujetos concretos: SensorTemperatura, SensorMovimiento)\n\n# TODO: 3. Patrón Factory Method (SensorFactory)\n\n# TODO: 4. Script de prueba: Crear sensores, suscribir observador y lanzar eventos\n'
+  },
+  {
+    id: 45,
+    title: "45. Evaluación: Gestión de Cursos de Nivelación",
+    category: "Proyectos POO",
+    type: "project",
+    lesson: `## Evaluación Práctica: Sistema de Gestión de Cursos de Nivelación
+
+Una institución de educación superior requiere un sistema que permita gestionar la inscripción de estudiantes en cursos de nivelación mediante una interfaz en consola desarrollada en Python.
+
+El sistema deberá desarrollarse íntegramente bajo el paradigma de Programación Orientada a Objetos (POO) y aplicar los patrones de diseño Factory Method y Observer.
+
+El desarrollo deberá evidenciar:
+- Abstracción mediante clases abstractas.
+- Herencia para definir los distintos tipos de estudiantes.
+- Polimorfismo en el comportamiento de los objetos creados.
+- Encapsulamiento de atributos utilizando propiedades.
+- Aplicación del patrón de diseño Factory Method para la creación de estudiantes.
+- Aplicación del patrón de diseño Observer para notificar las inscripciones realizadas.
+- Aplicación de al menos tres principios SOLID, debidamente comentados en el código.
+- Separación de responsabilidades entre la lógica de negocio, la creación de objetos, el sistema de notificaciones y la interfaz de consola.`,
+    instructions: `**Requerimientos:**
+1. **Clase Abstracta Estudiante:** Atributos encapsulados (\`@property\`) y método abstracto \`descuento()\`.
+2. **Clases EstudianteRegular y EstudianteBecado:** Heredan de \`Estudiante\` e implementan \`descuento()\` (Regular: 0%, Becado: 50%).
+3. **Clase EstudianteFactory (Factory Method):** Implementa el método \`crear_estudiante(tipo, nombre)\`. Es la única responsable de crear instancias.
+4. **Patrón Observer:** \`SistemaInscripciones\` (Sujeto) notifica inscripciones. \`NotificadorConsola\` (Observador) muestra la notificación en pantalla.
+5. **Clase Inscripcion:** Almacena estudiante y curso de nivelación.
+6. **Interfaz en Consola (AppCursos):** Menú para interactuar, registrar inscripción (creando automáticamente con factory y activando notificaciones) interactuando únicamente con el modelo sin violar el encapsulamiento.`,
+    initialCode: 'from abc import ABC, abstractmethod\n\n# 1. Clase Abstracta Estudiante\n\n\n# 2. Estudiantes concretos (Regular, Becado)\n\n\n# 3. Factory Method (EstudianteFactory)\n\n\n# 4. Patrón Observer (Sujeto y Observadores)\n\n\n# 5. Clase Inscripcion\n\n\n# 6. Clase AppCursos (Interfaz Consola)\n\nif __name__ == "__main__":\n    # TODO: Iniciar la aplicación en consola\n    pass\n'
   }
 ];
 
